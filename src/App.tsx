@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import ThemeDivider from './ui/ThemeDivider';
-import { FaCircleMinus, FaCirclePlus, FaCartShopping, FaXmark } from "react-icons/fa6";
+import { FaCircleMinus, FaCirclePlus, FaCartShopping, FaXmark, FaCircleQuestion } from "react-icons/fa6";
 import Modal from "react-modal" 
 import QRCode from 'react-qr-code';
+import formatPrice from './utils/formatPrice';
 
 interface IBanners {
   id: number;
@@ -27,16 +28,15 @@ interface IProducts {
   count?: number | undefined;
 }
 
-interface IMenus {
-  id: number;
-  title: string;
-  img?: string;
-};
-
 interface IMenuList {
   id: number;
-  category_title: string;
-  products: IProducts[];
+  menu_title: string;
+  img: string;
+  categories: {
+    id: number;
+    category_title: string;
+    products: IProducts[];
+  } [];
 };
 
 function App() {
@@ -68,126 +68,213 @@ function App() {
     },
   ];
 
-  const menus: IMenus[] = [
-    {
-      id: 1,
-      title: 'Меню ресторана',
-      img: 'https://cdn.britannica.com/02/239402-050-ACC075DB/plates-of-vegan-foods-ready-serve-restaurant-London.jpg'
-    },
-    {
-      id: 2,
-      title: 'Барное меню',
-      img: 'https://happy-bottle.club/images/blog/3/Tequila.jpg'
-    },
-    {
-      id: 3,
-      title: 'Винная карта',
-      img: 'https://derbentwine.ru/upload/iblock/079/079aaece3e1573670a29f0d8df2b6f68.jpg'
-    },
-    {
-      id: 4,
-      title: 'Ночное меню',
-      img: 'https://static.1000.menu/img/content/28294/airan-tureckii_1534240557_1_max.jpg'
-    },
-  ];
 
   const [productList, setProductList] = useState<IMenuList[]>([
     {
       id: 1,
-      category_title: 'Салаты',
-      products: [
+      menu_title: 'Меню ресторана',
+      img: 'https://e1.edimdoma.ru/data/posts/0002/7253/27253-ed4_wide.jpg?1671786759',
+      categories: [
         {
-          id: 1,
-          description: 'Куриное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-          title: 'Оливье с курицей',
-          old_price: 1500,
-          price: 1300,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/WgykJzu85H_thumb.jpeg'
+          id: 1, 
+          category_title: 'Салаты',
+          products: [
+            {
+              id: 1,
+              description: 'Куриное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
+              title: 'Оливье с курицей',
+              old_price: 1500,
+              price: 1300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/WgykJzu85H_thumb.jpeg'
+            },
+            {
+              id: 2,
+              description: 'Рыбное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
+              title: 'Сельдь под шубой',
+              old_price: 2200,
+              price: 1900,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
+              count: 0
+            },
+            
+          ],
         },
         {
           id: 2,
-          description: 'Рыбное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-          title: 'Сельдь под шубой',
-          old_price: 2200,
-          price: 1900,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
-          count: 0
+          category_title: 'Горячие блюда',
+          products: [
+            {
+              id: 3,
+              description: 'Котлета с луком по домащнему с картофельным пюре',
+              title: 'Котлета с луком по домащнему с картофельным пюре',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 4,
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              title: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
+              count: 0
+            }
+          ]
         },
-        
+        {
+          id: 3,
+          category_title: 'Супы',
+          products: [
+            {
+              id: 5,
+              title: 'Харчо',
+              description: 'Украинский харчо от нашего шеф повара',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 6,
+              title: 'Мясо по казахски',
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: false,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 7,
+              title: 'Харчо',
+              description: 'Украинский харчо от нашего шеф повара',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 8,
+              title: 'Мясо по казахски',
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            }
+          ]
+        },
       ]
+      
     },
     {
       id: 2,
-      category_title: 'Горячие блюда',
-      products: [
+      menu_title: 'Завтраки',
+      img: 'https://opis-cdn.tinkoffjournal.ru/mercury/main_recept-gruzia.gbgyes.jpg',
+      categories: [
+        {
+          id: 1, 
+          category_title: 'Анчоусы',
+          products: [
+            {
+              id: 1,
+              description: 'Куриное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
+              title: 'Рыба запеченная в духовке',
+              old_price: 1500,
+              price: 1300,
+              isActive: true,
+              img: 'https://gotovim-doma.ru/images/recipe/a/af/aaf296508a1b60d2aeb7460574aadcfb_l.jpg'
+            },
+            {
+              id: 2,
+              description: 'Рыбное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
+              title: 'Сельдь под шубой',
+              old_price: 2200,
+              price: 1900,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
+              count: 0
+            },
+            
+          ],
+        },
+        {
+          id: 2,
+          category_title: 'Соусы',
+          products: [
+            {
+              id: 3,
+              description: 'Котлета с луком по домащнему с картофельным пюре',
+              title: 'Котлета с луком по домащнему с картофельным пюре',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 4,
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              title: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
+              count: 0
+            }
+          ]
+        },
         {
           id: 3,
-          description: 'Котлета с луком по домащнему с картофельным пюре',
-          title: 'Котлета с луком по домащнему с картофельным пюре',
-          old_price: 2500,
-          price: 2300,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+          category_title: 'Супы',
+          products: [
+            {
+              id: 5,
+              title: 'Харчо',
+              description: 'Украинский харчо от нашего шеф повара',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 6,
+              title: 'Мясо по казахски',
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: false,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 7,
+              title: 'Харчо',
+              description: 'Украинский харчо от нашего шеф повара',
+              old_price: 2500,
+              price: 2300,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            },
+            {
+              id: 8,
+              title: 'Мясо по казахски',
+              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
+              old_price: 0,
+              price: 2500,
+              isActive: true,
+              img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+            }
+          ]
         },
-        {
-          id: 4,
-          description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-          title: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-          old_price: 0,
-          price: 2500,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
-          count: 0
-        }
       ]
-    },
-    {
-      id: 3,
-      category_title: 'Супы',
-      products: [
-        {
-          id: 5,
-          title: 'Харчо',
-          description: 'Украинский харчо от нашего шеф повара',
-          old_price: 2500,
-          price: 2300,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
-        },
-        {
-          id: 6,
-          title: 'Мясо по казахски',
-          description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-          old_price: 0,
-          price: 2500,
-          isActive: false,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
-        },
-        {
-          id: 7,
-          title: 'Харчо',
-          description: 'Украинский харчо от нашего шеф повара',
-          old_price: 2500,
-          price: 2300,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
-        },
-        {
-          id: 8,
-          title: 'Мясо по казахски',
-          description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-          old_price: 0,
-          price: 2500,
-          isActive: true,
-          img: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
-        }
-      ]
+      
     },
   ]);
 
-  const [selectedMenu, setSelectedMenu] = useState<number>(menus[0].id);
+  const [selectedMenu, setSelectedMenu] = useState<number>(productList[0].id);
   const [selectedCategory, setSelectedCategory] = useState<number>(productList[0].id);
   const [cartProducts, setCartProducts] = useState<IMenuList[]>([]);
   const [total, setTotal] = useState({totalPrice: 0, totalCount: 0});
@@ -197,7 +284,10 @@ function App() {
 
   const filteredProductList = productList.map(category => ({
     ...category,
-    products: category.products.filter(product => product.count && product.count > 0)
+    categories: category.categories.map(subcategory => ({
+      ...subcategory,
+      products: subcategory.products.filter(product => product.count && product.count > 0)
+    }))
   }));
 
   useEffect(()=>{
@@ -205,51 +295,70 @@ function App() {
     setTotal({totalPrice: totalPrice, totalCount: totalCount});
   },[productList]);
 
-  useEffect(()=>{
+  useEffect(() => {
     let idProducts = '';
-    cartProducts.map((category) => 
-      category.products.map((product) =>
-        idProducts = idProducts + product.id + ','
-      )
-    )
+    productList.forEach((menu) => {
+      menu.categories.forEach((category) => {
+        category.products.forEach((product) => {
+          idProducts += product.id + ',';
+        });
+      });
+    });
     setQrLink(idProducts);
-  },[cartProducts])
+  }, [productList]);
 
-  const incrementCount = (categoryId: number, productId: number, operations: boolean) => {
+  const incrementCount = (menuId: number, categoryId: number, productId: number, operations: boolean) => {
     setProductList((prevProductList) => {
-      return prevProductList.map((category) => {
-        if (category.id === categoryId) {
+      return prevProductList.map((menu) => {
+        if (menu.id === menuId) {
           return {
-            ...category,
-            products: category.products.map((product) => {
-              if (product.id === productId) {
-                if(operations) {
-                  return {...product, count: (product.count || 0) + 1,};
-                }
-                else {
-                  if(product.count || 0 > 0){
-                    return {...product, count: (product.count || 0) - 1,};
-                  }
-                }
+            ...menu,
+            categories: menu.categories.map((category) => {
+              if (category.id === categoryId) {
+                return {
+                  ...category,
+                  products: category.products.map((product) => {
+                    if (product.id === productId) {
+                      if (operations) {
+                        return {
+                          ...product,
+                          count: (product.count || 0) + 1,
+                        };
+                      } else {
+                        if ((product.count || 0) > 0) {
+                          return {
+                            ...product,
+                            count: (product.count || 0) - 1,
+                          };
+                        }
+                      }
+                    }
+                    return product;
+                  }),
+                };
               }
-              return product;
+              return category;
             }),
           };
         }
-        return category;
+        return menu;
       });
     });
   };
 
-  const totalPrice = filteredProductList.reduce((total, category) => {
-    return total + category.products.reduce((subTotal, product) => {
-      return subTotal + (product.count || 0) * product.price;
+  const totalPrice = productList.reduce((total, menu) => {
+    return total + menu.categories.reduce((categoryTotal, category) => {
+      return categoryTotal + category.products.reduce((subTotal, product) => {
+        return subTotal + (product.count || 0) * product.price;
+      }, 0);
     }, 0);
   }, 0);
-
-  const totalCount: number = filteredProductList.reduce((total, category) => {
-    return total + category.products.reduce((subTotal, product) => {
-      return subTotal + (product.count || 0);
+  
+  const totalCount: number = productList.reduce((total, menu) => {
+    return total + menu.categories.reduce((categoryTotal, category) => {
+      return categoryTotal + category.products.reduce((subTotal, product) => {
+        return subTotal + (product.count || 0);
+      }, 0);
     }, 0);
   }, 0);
 
@@ -261,17 +370,17 @@ function App() {
             <div className='w-full'>
               <div className='p-5'>
                 <div className='flex w-full justify-end pb-6'>
-                  <span className='text-white me-6'>
+                  <span className='text-white me-6 font-semibold'>
                     Оставить отзыв
                   </span>
-                  <span className='text-white'>
-                    
+                  <span className='text-white font-semibold'>
+                    Книга жалоб
                   </span>
+                  <span className='text-white'></span>
                 </div>
                 <p className='text-xl text-white font-semibold mb-3'>
-                  Ресторан Svoy
+                  <div className='flex flex-row items-center'>Ресторан Svoy <FaCircleQuestion className='ms-2' size={24}/></div>
                 </p>
-                
               </div>
             </div>
           </div>
@@ -308,21 +417,20 @@ function App() {
                 </div>
               </>
             }
-            
             <div className='flex flex-row w-full overflow-y-scroll no-scrollbar px-5'>
               {
-                menus.map((menu, index)=>
+                productList.map((menu, index)=>
                   <div key={index} onClick={()=>{setSelectedMenu(menu.id)}}>
                     {
                       menu.id === selectedMenu ?
                       <div className='w-[120px] p-3 bg-blue-500 rounded-xl text-center me-3 h-[170px] cursor-pointer' key={index} >
                         <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={menu.img} />
-                        <p className='text-white mt-1 text-sm font-semibold'>{menu.title}</p>
+                        <p className='text-white mt-1 text-sm font-semibold'>{menu.menu_title}</p>
                       </div>
                       :
                       <div className='w-[120px] p-3 bg-gray-100 rounded-xl text-center me-3 h-[170px] cursor-pointer' key={index}>
                         <img className='object-cover  w-[100px] h-[100px] rounded-full mx-auto' src={menu.img}/>
-                        <p className='text-sm mt-1'>{menu.title}</p>
+                        <p className='text-sm mt-1'>{menu.menu_title}</p>
                       </div>
                     }
                   </div>
@@ -334,97 +442,114 @@ function App() {
             </div>
             <div className='w-full flex flex-row overflow-y-scroll no-scrollbar px-5 pt-5 pb-5 sticky top-0 border-b-2 border-gray-200 bg-white'>
               {
-                productList.map((category, index)=>
-                  <div key={index}>
-                    {
-                      category.id === selectedCategory ?
-                      <button className={`bg-blue-500 py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
-                        {category.category_title}
-                      </button>
-                      :
-                      <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
-                        {category.category_title}
-                      </button>
-                    }
-                  </div>
+                productList
+                .filter(menu => menu.id === selectedMenu)
+                .map((menu, index)=>
+                <React.Fragment key={index}>
+                  {
+                    menu.categories.map((category, index)=>
+                    <div key={index}>
+                      {
+                        category.id === selectedCategory ?
+                        <button className={`bg-blue-500 py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
+                          {category.category_title}
+                        </button>
+                        :
+                        <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
+                          {category.category_title}
+                        </button>
+                      }
+                    </div>
+                    )
+                  }
+                </React.Fragment>
                 )
               }
             </div>
             <div className='w-full p-5 pb-[50px]'>
-              {productList.map((productListItem, index)=>
-                <div key={index}>
-                  { 
-                    productListItem.products.length > 0 &&
-                    <div key={index} id={productListItem.id.toString()}>
-                      <p className='text-2xl font-semibold my-3'>
-                        {productListItem.category_title}
-                      </p>
-                      {
-                        productListItem.products
-                        .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
-                        .map((product, indexProduct)=>
-                          <div className={`flex w-full py-3 ${!product.isActive && 'opacity-35'}`} key={indexProduct}>
-                            {
-                              product.img &&
-                              <div className='me-3'>
-                                <img className='rounded-lg' width={150} height={150} src={product.img}/>
-                              </div>     
-                            }
-                            <div className='w-full flex flex-col justify-between'>
-                              <div>
-                                <p className='font-semibold text-xl line-clamp-3'>{product.title}</p>
+              {productList.filter(menu => menu.id === selectedMenu).map((menu)=>
+                <div key={menu.id}>
+                  {
+                    menu.categories.map((category, index) =>
+                    <div key={index}>
+                      { 
+                        category.products.length > 0 &&
+                        <div key={index} id={category.id.toString()}>
+                          {
+                            searchText.length === 0 &&
+                            <p className='text-2xl font-semibold my-3'>
+                              {category.category_title}
+                            </p>
+                          }
+                          
+                          {
+                            category.products
+                            .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
+                            .map((product, indexProduct)=>
+                              <div className={`flex w-full py-3 ${!product.isActive && 'opacity-35'}`} key={indexProduct}>
                                 {
-                                  !product.isActive &&
-                                  <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
+                                  product.img &&
+                                  <div className='me-3'>
+                                    <img className='rounded-lg' width={150} height={150} src={product.img}/>
+                                  </div>     
                                 }
-                                
-                                <p className='text-gray-500 mt-1 line-clamp-2'>{product.description}</p>
-                              </div>
-                              <div className='flex flex-row justify-between'>
-                                <div className='flex flex-row items-end'>
-                                  <span className='text-xl font-semibold text-blue-500'>{product.price} Т</span>
-                                  {
-                                    product.old_price > 0 &&
-                                    <span className='text-lg text-gray-400 line-through ms-3'>{product.old_price}</span>
-                                  }
-                                </div>
-                                {
-                                  product.isActive &&
-                                  <div className='flex flex-row items-center'>
+                                <div className='w-full flex flex-col justify-between'>
+                                  <div>
+                                    <p className='font-semibold text-lg line-clamp-3'>{product.title}</p>
                                     {
-                                      product.count !== undefined && product.count > 0 && 
-                                      <>
-                                        <FaCircleMinus size={24} className='text-blue-500' onClick={()=>{incrementCount(productListItem.id, product.id, false);}}/>
-                                        <span className='text-xl font-semibold px-3'>{product.count}</span>
-                                      </>
+                                      !product.isActive &&
+                                      <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
                                     }
-                                    <FaCirclePlus size={24} className='text-blue-500' onClick={()=>{incrementCount(productListItem.id, product.id, true);}}/>
+                                    
+                                    <p className='text-gray-500 mt-1 line-clamp-2 text-sm'>{product.description}</p>
                                   </div>
-                                }
+                                  <div className='flex flex-row justify-between items-end'>
+                                    <div className='flex flex-row items-end'>
+                                      <span className='text-xl font-semibold text-blue-500'>{formatPrice(product.price)}</span>
+                                      {
+                                        product.old_price > 0 &&
+                                        <span className='text-lg text-gray-400 line-through ms-3'>{formatPrice(product.old_price)}</span>
+                                      }
+                                    </div>
+                                    {
+                                      product.isActive &&
+                                      <div className='flex flex-row items-center'>
+                                        {
+                                          product.count !== undefined && product.count > 0 && 
+                                          <>
+                                            <FaCircleMinus size={24} className='text-blue-500' onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
+                                            <span className='text-xl font-semibold px-3'>{product.count}</span>
+                                          </>
+                                        }
+                                        <FaCirclePlus size={24} className='text-blue-500' onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                        )
+                            )
+                          }
+                        </div>
                       }
                     </div>
+                    )
                   }
                 </div>
               )}
-
             </div>
-            
           </div>
           {
             totalCount > 0 &&
             <div className={`transition duration-300 ease-in-out flex fixed bottom-0 z-49 w-full text-center max-w-[899px] px-10 py-5 justify-center ${totalCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
               <button className='bg-blue-500 py-2 hover:bg-blue-700 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap'>
-                <div className='flex flex-row items-center' onClick={() => setShowModal(true)}><FaCartShopping className='me-3'/> Оформить корзину {totalPrice} Т</div>
+                <div className='flex flex-row items-center' onClick={() => setShowModal(true)}><FaCartShopping className='me-3'/> Оформить корзину {formatPrice(totalPrice)}</div>
               </button>
             </div>
           }
           
           <Modal
             isOpen={showModal}
+            ariaHideApp={false}
             contentLabel="Modal"
             className={'w-full max-w-[899px] bg-white h-full z-50 p-5'}
           >
@@ -434,40 +559,46 @@ function App() {
             </div>
             <div className={`w-full mt-5 overflow-auto h-lvh pb-[120px] no-scrollbar`}>
               {
-                cartProducts.map((productListItem, cartIndex)=>
+                cartProducts.map((menu, cartIndex)=>
                   <div key={cartIndex}>
-                    {productListItem.products.map((product, indexProduct)=>
-                      <div className={`flex w-full pt-2 ${!product.isActive && 'opacity-35'}`} key={indexProduct}>
-                        <div className='w-full flex flex-col justify-between'>
-                          <div>
-                            <p className='text-lg line-clamp-3'>{product.title}</p>
-                            {
-                              !product.isActive &&
-                              <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
-                            }
-                          </div>
-                          <div className='flex flex-row justify-between mt-2'>
-                            {
-                              product.isActive &&
-                              <div className='flex flex-row items-center'>
+                    {
+                      menu.categories.map((category, categoryIndex)=>
+                      <div key={categoryIndex}>
+                        {category.products.map((product, indexProduct)=>
+                          <div className={`flex w-full pt-2 ${!product.isActive && 'opacity-35'}`} key={indexProduct}>
+                            <div className='w-full flex flex-col justify-between'>
+                              <div>
+                                <p className='text-lg line-clamp-3'>{product.title}</p>
                                 {
-                                  product.count !== undefined && product.count > 0 && 
-                                  <>
-                                    <FaCircleMinus size={24} className='text-blue-500' onClick={()=>{incrementCount(productListItem.id, product.id, false);}}/>
-                                    <span className='text-xl font-semibold px-3'>{product.count}</span>
-                                  </>
+                                  !product.isActive &&
+                                  <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
                                 }
-                                <FaCirclePlus size={24} className='text-blue-500' onClick={()=>{incrementCount(productListItem.id, product.id, true);}}/>
                               </div>
-                            }
-                            <div className='flex flex-row items-end'>
-                              <span className='text-xl font-semibold text-blue-500'>{product.price*(product.count || 0)} Т</span>
+                              <div className='flex flex-row justify-between mt-2'>
+                                {
+                                  product.isActive &&
+                                  <div className='flex flex-row items-center'>
+                                    {
+                                      product.count !== undefined && product.count > 0 && 
+                                      <>
+                                        <FaCircleMinus size={24} className='text-blue-500' onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
+                                        <span className='text-xl font-semibold px-3'>{product.count}</span>
+                                      </>
+                                    }
+                                    <FaCirclePlus size={24} className='text-blue-500' onClick={()=>{incrementCount(menu.id,category.id, product.id, true);}}/>
+                                  </div>
+                                }
+                                <div className='flex flex-row items-end'>
+                                  <span className='text-xl font-semibold text-blue-500'>{formatPrice(product.price*(product.count || 0))}</span>
+                                </div>
+                              </div>
+                              <ThemeDivider pt={5}/>
                             </div>
                           </div>
-                          <ThemeDivider pt={5}/>
-                        </div>
+                        )}
                       </div>
-                    )}
+                      )
+                    }
                   </div>
                 )
               }
@@ -476,7 +607,7 @@ function App() {
                   Сумма заказа:
                 </span>
                 <span className='text-xl'>
-                  {total.totalPrice}
+                  {formatPrice(total.totalPrice)}
                 </span>
               </div>
               {/* <div className='text-center w-full mt-4'>
