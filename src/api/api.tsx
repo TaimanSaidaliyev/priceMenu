@@ -29,4 +29,8 @@ export class Dictionary {
         const response = await axios.get(BACK_HOST + `/dict/${category_id}/products/`);
         return response;
     }
+    static async getProductById(product_id: string) {
+        const response = await axios.get(BACK_HOST + `/dict/${product_id}/product/information/`);
+        return response;
+    }
 }

@@ -19,6 +19,7 @@
     price: number;
     old_price: number;
     is_active: boolean;
+    is_published: boolean;
     photo: string;
     count?: number | undefined;
   }

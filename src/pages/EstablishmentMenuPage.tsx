@@ -32,7 +32,8 @@ function EstablishmentMenuPage() {
               old_price: 1500,
               price: 1300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/WgykJzu85H_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/WgykJzu85H_thumb.jpeg',
+              is_published: false
             },
             {
               id: 2,
@@ -42,7 +43,8 @@ function EstablishmentMenuPage() {
               price: 1900,
               is_active: true,
               photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
-              count: 0
+              count: 0,
+              is_published: false
             },
             
           ],
@@ -58,7 +60,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 4,
@@ -68,7 +71,8 @@ function EstablishmentMenuPage() {
               price: 2500,
               is_active: true,
               photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
-              count: 0
+              count: 0,
+              is_published: false
             }
           ]
         },
@@ -83,7 +87,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 6,
@@ -92,7 +97,8 @@ function EstablishmentMenuPage() {
               old_price: 0,
               price: 2500,
               is_active: false,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 7,
@@ -101,7 +107,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 8,
@@ -110,7 +117,8 @@ function EstablishmentMenuPage() {
               old_price: 0,
               price: 2500,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             }
           ]
         },
@@ -133,7 +141,8 @@ function EstablishmentMenuPage() {
               old_price: 1500,
               price: 1300,
               is_active: true,
-              photo: 'https://gotovim-doma.ru/images/recipe/a/af/aaf296508a1b60d2aeb7460574aadcfb_l.jpg'
+              photo: 'https://gotovim-doma.ru/images/recipe/a/af/aaf296508a1b60d2aeb7460574aadcfb_l.jpg',
+              is_published: false
             },
             {
               id: 2,
@@ -143,6 +152,7 @@ function EstablishmentMenuPage() {
               price: 1900,
               is_active: true,
               photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
+              is_published: false,
               count: 0
             },
             
@@ -159,7 +169,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 4,
@@ -169,6 +180,7 @@ function EstablishmentMenuPage() {
               price: 2500,
               is_active: true,
               photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
+              is_published: false,
               count: 0
             }
           ]
@@ -184,7 +196,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 6,
@@ -193,7 +206,8 @@ function EstablishmentMenuPage() {
               old_price: 0,
               price: 2500,
               is_active: false,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 7,
@@ -202,7 +216,8 @@ function EstablishmentMenuPage() {
               old_price: 2500,
               price: 2300,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             },
             {
               id: 8,
@@ -211,7 +226,8 @@ function EstablishmentMenuPage() {
               old_price: 0,
               price: 2500,
               is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg'
+              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
+              is_published: false
             }
           ]
         },
