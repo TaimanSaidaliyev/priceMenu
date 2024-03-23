@@ -1,12 +1,13 @@
 import React from 'react'
 
-export const ThemeInputText = ({onChange, value, className}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, className?: string}) => {
+export const ThemeInputText = ({onChange, value, className, required}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, className?: string, required?: boolean}) => {
   return (
     <input 
       type="text" 
       placeholder='Поиск' 
       onChange={onChange} 
       value={value} 
+      required={required || false}
       className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${className}`}
     />
   )
@@ -31,7 +32,6 @@ export const ThemeInputNumber = ({onChange, value, required}:{onChange?: React.C
       onChange={onChange} 
       value={value} 
       type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-      pattern="^\d{5}(-\d{4})?$" 
       required={required || false}
     />
   )

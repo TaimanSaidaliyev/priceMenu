@@ -13,15 +13,17 @@
   };
   
   interface IProducts {
-    id: number;
+    id: string;
     title: string;
+    category: string;
     description: string;
     price: number;
     old_price: number;
     is_active: boolean;
     is_published: boolean;
-    photo: string;
+    photo?: File | null;
     count?: number | undefined;
+    establishment?: string;
   }
   
   interface IMenuList {
@@ -33,16 +35,27 @@
       category_title: string;
       products: IProducts[];
     } [];
+    establishment: number;
   };
   
+  interface IMenu {
+    id: string;
+    menu_title: string;
+    photo?: File | null;
+    establishment: number;
+    categories?: [];
+  }
+
   interface ICategory {
-    id: number;
+    id: string;
     category_title: string;
     photo?: string | '';
+    establishment?: number;
+    products?: IProducts[];
   }
 
   interface IEstablishment {
-    id: number,
+    id: string,
     title: string,
     default_color: string | '#000000',
     secondary_color?: boolean | true,

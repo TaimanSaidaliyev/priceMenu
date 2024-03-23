@@ -295,7 +295,7 @@ function EstablishmentMenuPage() {
     setQrLink(idProducts);
   }, [productList]);
 
-  const incrementCount = (menuId: number, categoryId: number, productId: number, operations: boolean) => {
+  const incrementCount = (menuId: number, categoryId: number, productId: string, operations: boolean) => {
     setProductList((prevProductList) => {
       return prevProductList.map((menu) => {
         if (menu.id === menuId) {
@@ -553,7 +553,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                           {
                             product.photo &&
                             <div className='me-3'>
-                              <img className='object-cover rounded-lg' width={150} height={150} src={BACK_HOST + product.photo}/>
+                              <img className='object-cover rounded-lg w-[150px] min-h-[150px]' src={`${BACK_HOST + product.photo}`}/>
                             </div>     
                           }
                           <div className='w-full flex flex-col justify-between'>
@@ -624,7 +624,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                         .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                         .map((product, indexProduct)=>
                           <div className={`text-center justify-center bg-gray-100 rounded-lg p-3 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
-                            <img className='object-cover rounded-lg h-[150px] w-full' src={BACK_HOST + product.photo}/>
+                            <img className='object-cover rounded-lg h-[150px] w-full' src={`${product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} `}/>
                             <p className='pb-2 text-start line-clamp-2'>
                               {product.title}
                             </p>
