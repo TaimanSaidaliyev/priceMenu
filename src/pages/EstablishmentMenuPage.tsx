@@ -426,8 +426,8 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                       .sort((a, b) => a.sorting_number - b.sorting_number)
                       .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                       .map((product, indexProduct)=>
-                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} `} key={indexProduct} onClick={()=>{setProduct(product); setShowProductModal(true)}}>
-                          <div className='relative'>
+                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} `} key={indexProduct}>
+                          <div className='relative' onClick={()=>{setProduct(product); setShowProductModal(true)}}>
                           {
                             product.photo &&
                             <>
@@ -518,7 +518,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                         .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                         .map((product, indexProduct)=>
                           <div className={`text-center justify-center bg-gray-100 rounded-lg p-3 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
-                            <img className='object-cover rounded-lg h-[150px] w-full' src={`${product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} `}/>
+                            <img className='object-cover rounded-lg h-[150px] w-full' src={`${product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} `} onClick={()=>{setProduct(product); setShowProductModal(true)}}/>
                             <p className='pb-2 line-clamp-2 text-center'>
                               {product.title}
                             </p>
@@ -774,7 +774,7 @@ const ModalProductInfo = ({productList, selectedMenu, selectedCategory, setSelec
   return (
     <DialogModal isOpen={showProductModal} setIsOpen={setShowProductModal}>
     <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-2 py-2 border-b-2 border-gray-200'>
-        <img src={`${BACK_HOST}${product.photo}`} className={'object-cover max-h-[500px] rounded-md'}/>
+        <img src={product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} className={'object-cover max-h-[500px] rounded-md'}/>
         <p className='mt-3 text-xl font-semibold'>{product.title}</p>
 
             {
