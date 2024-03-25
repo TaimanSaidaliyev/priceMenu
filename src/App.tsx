@@ -7,7 +7,11 @@ import EstablishmentMenuPage from './pages/EstablishmentMenuPage';
 import MainPage from './pages/MainPage';
 import NotFound from './pages/NotFound';
 import EstablishmentInfoPage from './pages/EstablishmentInfoPage';
-import MenuEditPage from './pages/MenuEditPage';
+import SettingsMenuPage from './pages/SettingsMenuPage';
+import SettingsGeneralPage from './pages/SettingsGeneralPage';
+import ListForWaiterPage from './pages/ListForWaiterPage';
+import AuthorizationPage from './pages/AuthorizationPage';
+
 
 const router = createBrowserRouter([
   {
@@ -27,8 +31,20 @@ const router = createBrowserRouter([
     element: <EstablishmentInfoPage/>
   },
   {
-    path: 'menu/edit/',
-    element: <MenuEditPage/>
+    path: 'settings/menu/',
+    element: <SettingsMenuPage/>
+  },
+  {
+    path: 'settings/general/',
+    element: <SettingsGeneralPage />
+  },
+  {
+    path: 'list_for_waiter/',
+    element: <ListForWaiterPage/>
+  },
+  {
+    path: 'login/',
+    element: <AuthorizationPage/> 
   },
 
 ]);

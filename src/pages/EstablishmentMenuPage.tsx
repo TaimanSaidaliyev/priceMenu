@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './../App.css'
 import ThemeDivider from './../ui/ThemeDivider';
-import { FaCircleMinus, FaCirclePlus, FaCartShopping, FaXmark, FaCircleQuestion, FaPlus } from "react-icons/fa6";
-import Modal from "react-modal" 
+import { FaCircleMinus, FaCirclePlus, FaCartShopping, FaCircleQuestion, FaPlus, FaBars, FaWhatsapp, FaPhone, FaLocationArrow, FaClock, FaChevronDown } from "react-icons/fa6";
 import QRCode from 'react-qr-code';
 import formatPrice from './../utils/formatPrice';
 import { useFetching } from './..//hooks/useFetching';
@@ -10,238 +9,37 @@ import { Establishment } from './..//api/api';
 import { BACK_HOST } from './..//configs/config';
 import { format } from 'date-fns';
 import BounceLoader from "react-spinners/BounceLoader";
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import FullSizeModal from '../ui/FullSizeModal';
+import { stringifyArray } from '../parser/parser';
+import { FaInstagram } from 'react-icons/fa';
+import DialogModal from '../ui/DialogModal';
 
 function EstablishmentMenuPage() {
   let { establishment_id } = useParams();
 
   const [productList, setProductList] = useState<IMenuList[]>([
     {
-      id: 1,
-      menu_title: 'Меню ресторана',
-      photo: 'https://e1.edimdoma.ru/data/posts/0002/7253/27253-ed4_wide.jpg?1671786759',
+      establishment: '0',
+      id: 0,
+      menu_title: '',
       categories: [
-        {
-          id: 1, 
-          category_title: 'Салаты',
-          products: [
-            {
-              id: 1,
-              description: 'Куриное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-              title: 'Оливье с курицей',
-              old_price: 1500,
-              price: 1300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/WgykJzu85H_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 2,
-              description: 'Рыбное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-              title: 'Сельдь под шубой',
-              old_price: 2200,
-              price: 1900,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
-              count: 0,
-              is_published: false
-            },
-            
-          ],
-        },
-        {
-          id: 2,
-          category_title: 'Горячие блюда',
-          products: [
-            {
-              id: 3,
-              description: 'Котлета с луком по домащнему с картофельным пюре',
-              title: 'Котлета с луком по домащнему с картофельным пюре',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 4,
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              title: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
-              count: 0,
-              is_published: false
-            }
-          ]
-        },
-        {
-          id: 3,
-          category_title: 'Супы',
-          products: [
-            {
-              id: 5,
-              title: 'Харчо',
-              description: 'Украинский харчо от нашего шеф повара',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 6,
-              title: 'Мясо по казахски',
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: false,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 7,
-              title: 'Харчо',
-              description: 'Украинский харчо от нашего шеф повара',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 8,
-              title: 'Мясо по казахски',
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            }
-          ]
-        },
+      {
+        category_title: '', 
+        id: 0, 
+        products: [],
+        sorting_number: 0
+      },
       ]
-      
-    },
-    {
-      id: 2,
-      menu_title: 'Завтраки',
-      photo: 'https://opis-cdn.tinkoffjournal.ru/mercury/main_recept-gruzia.gbgyes.jpg',
-      categories: [
-        {
-          id: 1, 
-          category_title: 'Анчоусы',
-          products: [
-            {
-              id: 1,
-              description: 'Куриное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-              title: 'Рыба запеченная в духовке',
-              old_price: 1500,
-              price: 1300,
-              is_active: true,
-              photo: 'https://gotovim-doma.ru/images/recipe/a/af/aaf296508a1b60d2aeb7460574aadcfb_l.jpg',
-              is_published: false
-            },
-            {
-              id: 2,
-              description: 'Рыбное филе, картофель, яйцо, морковь, зеленый горошек, маринованные огурцы',
-              title: 'Сельдь под шубой',
-              old_price: 2200,
-              price: 1900,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/vWZX42y8vE_thumb.jpeg',
-              is_published: false,
-              count: 0
-            },
-            
-          ],
-        },
-        {
-          id: 2,
-          category_title: 'Соусы',
-          products: [
-            {
-              id: 3,
-              description: 'Котлета с луком по домащнему с картофельным пюре',
-              title: 'Котлета с луком по домащнему с картофельным пюре',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 4,
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              title: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/mi8vTWknvq_thumb.jpeg',
-              is_published: false,
-              count: 0
-            }
-          ]
-        },
-        {
-          id: 3,
-          category_title: 'Супы',
-          products: [
-            {
-              id: 5,
-              title: 'Харчо',
-              description: 'Украинский харчо от нашего шеф повара',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 6,
-              title: 'Мясо по казахски',
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: false,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 7,
-              title: 'Харчо',
-              description: 'Украинский харчо от нашего шеф повара',
-              old_price: 2500,
-              price: 2300,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            },
-            {
-              id: 8,
-              title: 'Мясо по казахски',
-              description: 'Томленая телятина с картофельным пюре под имбирно чесночным соусом',
-              old_price: 0,
-              price: 2500,
-              is_active: true,
-              photo: 'https://kamigroup.fra1.cdn.digitaloceanspaces.com/kami/prod/menuItemThumbnails/kJjem0xN4q_thumb.jpeg',
-              is_published: false
-            }
-          ]
-        },
-      ]
-      
-    },
+    }
   ]);
-
-  const [selectedMenu, setSelectedMenu] = useState<number>(productList[0].id);
-  const [selectedCategory, setSelectedCategory] = useState<number>(productList[0].id);
+  const [selectedMenu, setSelectedMenu] = useState<number>(productList[0].id || 0);
+  const [selectedCategory, setSelectedCategory] = useState<number>(productList[0].id || 0);
   const [cartProducts, setCartProducts] = useState<IMenuList[]>([]);
   const [total, setTotal] = useState({totalPrice: 0, totalCount: 0});
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [qrLink, setQrLink] = useState<string>('');
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
   const [establishment, setEstablishment] = useState<IEstablishment>();
   const [banners, setBanners] = useState<IBanners[]>([]);
@@ -255,7 +53,7 @@ function EstablishmentMenuPage() {
   const [getProductList, isGetProductListLoading, isGetProductListError] = useFetching(async () => {
     const response = await Establishment.getEstablishmentProductList(establishment_id || '0');
     setProductList(response.data.list);
-    setSelectedMenu(response.data.list[0].id);
+    setSelectedMenu(response.data.list[0].id || 0);
   });
 
   const [getPromotionsList, isGetPromotionsListLoading, isGetPromotionsListError] = useFetching(async () => {
@@ -270,7 +68,7 @@ function EstablishmentMenuPage() {
     getPromotionsList();
   },[]);
 
-  const filteredProductList = productList.map(category => ({
+  const filteredProductList = productList && productList.map(category => ({
     ...category,
     categories: category.categories.map(subcategory => ({
       ...subcategory,
@@ -282,18 +80,6 @@ function EstablishmentMenuPage() {
     setCartProducts(filteredProductList);
     setTotal({totalPrice: totalPrice, totalCount: totalCount});
   },[productList]);
-
-  useEffect(() => {
-    let idProducts = '';
-    productList.forEach((menu) => {
-      menu.categories.forEach((category) => {
-        category.products.forEach((product) => {
-          idProducts += product.id + ',';
-        });
-      });
-    });
-    setQrLink(idProducts);
-  }, [productList]);
 
   const incrementCount = (menuId: number, categoryId: number, productId: string, operations: boolean) => {
     setProductList((prevProductList) => {
@@ -354,44 +140,43 @@ function EstablishmentMenuPage() {
     <>
       <div className='flex w-full justify-center'>
         <div className='bg-white max-w-[900px] w-full border-gray-200 border'>
-            <PageHeader establishment={establishment} />
+            <PageHeader establishment={establishment} setShowInfoModal={setShowInfoModal} />
             <BannersPromotions searchText={searchText} establishment={establishment} banners={banners} promotions={promotions} isLoading={isGetPromotionsListLoading}/>
             <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
             <SearchFiled searchText={searchText} setSearchText={setSearchText}/>
-            <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/>
-            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu}/>
+            {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
+            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
             <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
-            <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} qrLink={qrLink} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
+            <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
+            <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
+            <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
         </div>
       </div>
     </>
   )
 }
 
-const PageHeader = ({ establishment }: { establishment?: IEstablishment }) => {
+const PageHeader = ({ establishment, setShowInfoModal }: { establishment?: IEstablishment, setShowInfoModal: Function }) => {
   return (
-    <div className={`flex bg-gray-500 w-full items-end bg-cover bg-center bg-[url('${BACK_HOST + establishment?.backgroundImage}')]`}>
-      <div className='w-full'>
-        <div className='p-5'>
-          <div className='flex w-full justify-end pb-6'>
-            <span className='text-white me-6 font-semibold'>
-              Оставить отзыв
-            </span>
-            <span className='text-white font-semibold'>
-              Книга жалоб
-            </span>
-            <span className='text-white'></span>
-          </div>
-          <p className='text-xl text-white font-semibold mb-3'>
-            <div className='flex flex-row items-center'>
-                {establishment?.title || ''} 
-                <a href={`/establishment/${establishment?.id}/info/`} target='_blank'>
-                    <FaCircleQuestion className='ms-2' size={24}/>
-                </a>
-            </div>
-          </p>
+    <div className='relative'>
+      <img src={`${BACK_HOST + establishment?.backgroundImage}`} className='object-cover h-[125px] w-full brightness-50 pointer-events-none'/>
+      <p className='absolute bottom-0 text-xl text-white font-semibold mb-3 ms-5'>
+        <div className='flex flex-row items-center'>
+            {establishment?.title || ''} 
+            <FaCircleQuestion className='ms-2' size={24} onClick={()=>{setShowInfoModal(true)}}/>
+            
         </div>
-      </div>
+      </p>
+      <p className='absolute top-0 right-0 text-lg text-white mt-3 me-5'>
+        <div className='flex flex-row items-center'>
+          <span className='text-white me-6'>
+            Оставить отзыв
+          </span>
+          <span className='text-white'>
+            Книга жалоб
+          </span>
+        </div>
+      </p>
     </div>
   );
 };
@@ -461,7 +246,7 @@ const MenuBlock = ({ establishment, productList, selectedMenu, setSelectedMenu, 
                 <div key={index} onClick={()=>{setSelectedMenu(menu.id)}}>
                   {
                     menu.id === selectedMenu ?
-                    <div className='w-[120px] p-3 rounded-xl text-center me-3 h-[170px] cursor-pointer' style={{backgroundColor: establishment?.default_color}} key={index} >
+                    <div className='w-[130px] p-3 rounded-xl text-center me-3 h-[170px] cursor-pointer' style={{backgroundColor: establishment?.default_color}} key={index} >
                       <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={BACK_HOST + menu.photo} />
                       <p className='text-white mt-1 text-sm font-semibold'>{menu.menu_title}</p>
                     </div>
@@ -504,7 +289,7 @@ const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, 
           .map((menu, index)=>
           <React.Fragment key={index}>
             {
-              menu.categories && menu.categories.map((category, index)=>
+              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
               <div key={index}>
                 {
                   category.id === selectedCategory ?
@@ -527,33 +312,37 @@ const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, 
   );
 };
 
-const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function}) => {
+const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount, setShowCategoryModal, showCategoryModal}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function, setShowCategoryModal: Function, showCategoryModal: boolean }) => {
   if(establishment?.menu_view_type === "List"){
     return (
       <div className='w-full p-5 pb-[100px]'>
         {productList.filter(menu => menu.id === selectedMenu).map((menu)=>
           <div key={menu.id}>
             {
-              menu.categories && menu.categories.map((category, index) =>
+              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index) =>
               <div key={index}>
                 { 
                   category.products.length > 0 &&
                   <div key={index} id={category.id.toString()}>
                     {
-                      searchText.length === 0 &&
-                      <p className='text-2xl font-semibold my-3'>
-                        {category.category_title}
-                      </p>
+                        searchText.length === 0 &&
+                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1'>
+                          <p className='text-2xl font-semibold my-3'>
+                            {category.category_title}
+                          </p>
+                          <FaChevronDown size={20} onClick={()=>{setShowCategoryModal(true)}}/>
+                        </div>
                     }
                     {
                       category.products
+                      .sort((a, b) => a.sorting_number - b.sorting_number)
                       .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                       .map((product, indexProduct)=>
                         <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
                           {
                             product.photo &&
-                            <div className='me-3'>
-                              <img className='object-cover rounded-lg w-[150px] min-h-[150px]' src={`${BACK_HOST + product.photo}`}/>
+                            <div className='me-3 w-[150px]'>
+                              <img className='object-cover rounded-lg w-[150px] min-h-[130px] max-h-[180px]' src={`${BACK_HOST + product.photo}`}/>
                             </div>     
                           }
                           <div className='w-full flex flex-col justify-between'>
@@ -614,9 +403,12 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                     <div key={index} id={category.id.toString()}>
                       {
                         searchText.length === 0 &&
-                        <p className='text-2xl font-semibold my-3'>
-                          {category.category_title}
-                        </p>
+                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1'>
+                          <p className='text-2xl font-semibold my-3'>
+                            {category.category_title}
+                          </p>
+                          <FaChevronDown size={20} onClick={()=>{setShowCategoryModal(true)}}/>
+                        </div>
                       }
                       <div className='grid gap-4 grid-cols-2 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3'>
                       {
@@ -625,7 +417,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                         .map((product, indexProduct)=>
                           <div className={`text-center justify-center bg-gray-100 rounded-lg p-3 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
                             <img className='object-cover rounded-lg h-[150px] w-full' src={`${product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} `}/>
-                            <p className='pb-2 text-start line-clamp-2'>
+                            <p className='pb-2 line-clamp-2 text-center'>
                               {product.title}
                             </p>
                             {
@@ -699,95 +491,215 @@ const BottomNavigationBar = ({totalCount, totalPrice, setShowModal, establishmen
   );
 };
 
-const ModalWindow = ({establishment, showModal, setShowModal, cartProducts, incrementCount, total, qrLink} : {establishment?: IEstablishment, showModal: boolean, setShowModal: Function, cartProducts: IMenuList[], incrementCount: Function, total: any, qrLink: string }) => {
+const ModalWindow = ({establishment, showModal, setShowModal, cartProducts, incrementCount, total } : {establishment?: IEstablishment, showModal: boolean, setShowModal: Function, cartProducts: IMenuList[], incrementCount: Function, total: any }) => {
+  const [urlQr, setUrlQr] = useState<string>('');
+  
+  useEffect(()=>{
+    const menuList: IMenuList[] = cartProducts;
+    const productsWithCount: IProducts[] = menuList.flatMap(menu => 
+      menu.categories.flatMap(category => 
+          category.products.filter(product => product.count || 0 > 0)
+      )
+    );
+    setUrlQr('http://localhost:5173/list_for_waiter/?products=' + stringifyArray(productsWithCount));
+    
+    
+  },[cartProducts]);
+  useEffect(()=>{
+    console.log(urlQr)
+  },[urlQr])
+
+
   return (
-    <Modal
-      isOpen={showModal}
-      ariaHideApp={false}
-      contentLabel="Modal"
-      className={'w-full max-w-[899px] bg-white h-full z-50 p-5'}
-    >
-      <div className='w-full flex justify-between'>
-        <span className='text-3xl' style={{color: establishment?.default_color}}>Корзина</span>
-        <FaXmark size={36} onClick={()=>{setShowModal(false);}}/>
-      </div>
+    <FullSizeModal isOpen={showModal} setIsOpen={setShowModal}>
       <div className={`w-full mt-5 overflow-auto h-lvh pb-[120px] no-scrollbar`}>
-        {
-          cartProducts.map((menu, cartIndex)=>
-            <div key={cartIndex}>
-              {
-                menu.categories.map((category, categoryIndex)=>
-                <div key={categoryIndex}>
-                  {category.products.map((product, indexProduct)=>
-                    <div className={`flex w-full pt-2 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
-                      <div className='w-full flex flex-col justify-between'>
-                        <div>
-                          <p className='text-lg line-clamp-3'>{product.title}</p>
-                          {
-                            !product.is_active &&
-                            <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
-                          }
-                        </div>
-                        <div className='flex flex-row justify-between mt-2'>
-                          {
-                            product.is_active &&
-                            <div className='flex flex-row items-center'>
-                              {
-                                product.count !== undefined && product.count > 0 && 
-                                <>
-                                  <FaCircleMinus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
-                                  <span className='text-xl font-semibold px-3'>{product.count}</span>
-                                </>
-                              }
-                              <FaCirclePlus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id,category.id, product.id, true);}}/>
-                            </div>
-                          }
-                          <div className='flex flex-row items-end'>
-                            <span className='text-xl font-semibold' style={{color: establishment?.default_color}}>{formatPrice(product.price*(product.count || 0))}</span>
+          {
+            cartProducts.map((menu, cartIndex)=>
+              <div key={cartIndex}>
+                {
+                  menu.categories.map((category, categoryIndex)=>
+                  <div key={categoryIndex}>
+                    {category.products.map((product, indexProduct)=>
+                      <div className={`flex w-full pt-2 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
+                        <div className='w-full flex flex-col justify-between'>
+                          <div>
+                            <p className='text-lg line-clamp-3'>{product.title}</p>
+                            {
+                              !product.is_active &&
+                              <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
+                            }
                           </div>
+                          <div className='flex flex-row justify-between mt-2'>
+                            {
+                              product.is_active &&
+                              <div className='flex flex-row items-center'>
+                                {
+                                  product.count !== undefined && product.count > 0 && 
+                                  <>
+                                    <FaCircleMinus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
+                                    <span className='text-xl font-semibold px-3'>{product.count}</span>
+                                  </>
+                                }
+                                <FaCirclePlus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id,category.id, product.id, true);}}/>
+                              </div>
+                            }
+                            <div className='flex flex-row items-end'>
+                              <span className='text-xl font-semibold' style={{color: establishment?.default_color}}>{formatPrice(product.price*(product.count || 0))}</span>
+                            </div>
+                          </div>
+                          <ThemeDivider pt={5}/>
                         </div>
-                        <ThemeDivider pt={5}/>
                       </div>
-                    </div>
-                  )}
-                </div>
-                )
-              }
-            </div>
-          )
-        }
-        <div className='flex flex-row justify-between pt-4'>
-          <span className='text-xl'>
-            Сумма заказа:
-          </span>
-          <span className='text-xl'>
-            {formatPrice(total.totalPrice)}
-          </span>
-        </div>
-        {/* <div className='text-center w-full mt-4'>
-          <button className='bg-blue-500 py-2 hover:bg-blue-700 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap'>
-            <div className='flex flex-row items-center' onClick={() => setShowModal(true)}><FaQrcode className='me-3'/> Сгенерировать QR</div>
-          </button>
-        </div> */}
-        <ThemeDivider pt={5} pb={5}/>
-        <div style={{ height: "auto", margin: "0 auto", maxWidth: 180, width: "100%" }} className='pt-3'>
-          <QRCode
-            size={128}
-            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-            fgColor='#3b3b3b'
-            value={'https://example.com/page?array=1,2,3,4,5'}
-            viewBox={`0 0 256 256`}
-          />
-        </div>
-        <div className='w-full text-center mt-2'>
-          <span>Покажите полученный QR код официанту</span>
-          {qrLink}
-        </div>
-        
-      </div>
-    </Modal>
+                    )}
+                  </div>
+                  )
+                }
+              </div>
+            )
+          }
+          <div className='flex flex-row justify-between pt-4'>
+            <span className='text-xl'>
+              Сумма заказа:
+            </span>
+            <span className='text-xl'>
+              {formatPrice(total.totalPrice)}
+            </span>
+          </div>
+          <ThemeDivider pt={5} pb={5}/>
+          <div style={{ height: "auto", margin: "0 auto", maxWidth: 180, width: "100%" }} className='pt-3'>
+            <QRCode
+              size={128}
+              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              fgColor='#3b3b3b'
+              value={urlQr}
+              viewBox={`0 0 256 256`}
+            />
+          </div>
+          <div className='w-full text-center mt-2'>
+            <span>Покажите полученный QR код официанту</span>
+          </div>
+          
+      </div>  
+    </FullSizeModal>
   );
 };
+
+const ModalEstablishmentWindow = ({establishment, showModal, setShowModal} : {establishment?: IEstablishment, showModal: boolean, setShowModal: Function }) => {
+
+  return (
+    <DialogModal isOpen={showModal} setIsOpen={setShowModal}>
+      <div className={`w-full mt-5 overflow-auto no-scrollbar`}>
+        <div className='flex w-full justify-center'>
+            <div className='bg-white w-full'>
+                <div className='flex flex-row w-full p-5'>
+                    <img className='object-cover w-[150px] h-[150px] rounded-lg' src={BACK_HOST + establishment?.photo}/>
+                    <div className='ms-3'>
+                        <p className={`text-2xl font-semibold`} style={{color: establishment?.default_color}}>{establishment?.title}</p>
+                        <p className='text-lg flex items-center mt-2'>
+                            <FaPhone className='me-2' style={{color: establishment?.default_color}}/>
+                            {establishment?.phoneNumber}
+                        </p>
+                        <p className='text-lg flex items-center mt-2'>
+                            <FaLocationArrow className='me-2' style={{color: establishment?.default_color}}/>
+                            {establishment?.address}
+                        </p>
+                        <p className='text-lg flex items-center mt-2'>
+                            <FaClock className='me-2' style={{color: establishment?.default_color}}/>
+                            {establishment?.workTime}
+                        </p>
+                    </div>
+                </div>
+                <div className='py-2 px-5'>
+                    <button className='px-4 py-2 rounded-3xl text-white font-semibold me-2 whitespace-nowrap' style={{backgroundColor: "#E1306C"}}>
+                        <div className='flex flex-row items-center cursor-pointer'><FaInstagram size={24} className='me-3'/> aura_restaurant </div>
+                    </button>
+                    <button className='px-4 py-2 rounded-3xl text-white font-semibold me-2 whitespace-nowrap' style={{backgroundColor: "#075E54"}}>
+                        <div className='flex flex-row items-center cursor-pointer'><FaWhatsapp size={24} className='me-3'/> Написать </div>
+                    </button>
+                </div>
+                <div className='w-full px-5 py-5' >
+                    <p className='text-lg font-semibold'>Описание</p>
+                    {establishment?.description}
+                </div>
+                <div className='flex justify-center pb-5'>
+                    <button className='px-4 py-2 rounded-3xl text-white font-semibold me-2 whitespace-nowrap' style={{backgroundColor: establishment?.default_color}} onClick={()=>{setShowModal(false)}}>
+                        <div className='flex flex-row items-center cursor-pointer' >
+                            <FaBars size={20} className='me-3'/>Вернуться в меню
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+      </div>  
+    </DialogModal>
+  );
+};
+
+const ModalCategoryList = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment, showCategoryModal, setShowCategoryModal}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment, showCategoryModal: boolean, setShowCategoryModal: Function}) => {
+  return (
+    <DialogModal isOpen={showCategoryModal} setIsOpen={setShowCategoryModal}>
+    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
+        {
+          productList
+          .filter(menu => menu.id === selectedMenu)
+          .map((menu, index)=>
+          <React.Fragment key={index}>
+            {
+              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
+              <div key={index}>
+                {
+                  category.id === selectedCategory ?
+                  <div className={`py-2 px-4 my-1 text-white font-semibold me-2 whitespace-nowrap w-[300px]`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id); setShowCategoryModal(false)}}>
+                    {category.category_title}
+                  </div>
+                  :
+                  <div className="bg-white py-2 px-4 my-1 text-gray-500 font-semibold me-2 whitespace-nowrap w-[300px]" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`; setShowCategoryModal(false);}}>
+                    {category.category_title}
+                  </div>
+                }
+              </div>
+              )
+            }
+          </React.Fragment>
+          )
+        }
+    </div>
+    </DialogModal>
+  );
+}
+
+const ModalProductInfo = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment, showCategoryModal, setShowCategoryModal}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment, showCategoryModal: boolean, setShowCategoryModal: Function}) => {
+  return (
+    <DialogModal isOpen={showCategoryModal} setIsOpen={setShowCategoryModal}>
+    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
+        {
+          productList
+          .filter(menu => menu.id === selectedMenu)
+          .map((menu, index)=>
+          <React.Fragment key={index}>
+            {
+              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
+              <div key={index}>
+                {
+                  category.id === selectedCategory ?
+                  <div className={`py-2 px-4 my-1 text-white font-semibold me-2 whitespace-nowrap w-[300px]`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id); setShowCategoryModal(false)}}>
+                    {category.category_title}
+                  </div>
+                  :
+                  <div className="bg-white py-2 px-4 my-1 text-gray-500 font-semibold me-2 whitespace-nowrap w-[300px]" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`; setShowCategoryModal(false);}}>
+                    {category.category_title}
+                  </div>
+                }
+              </div>
+              )
+            }
+          </React.Fragment>
+          )
+        }
+    </div>
+    </DialogModal>
+  );
+}
 
 const SpinnerLoading = ({color}:{color?: string}) => {
   return (

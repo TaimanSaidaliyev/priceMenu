@@ -24,33 +24,37 @@
     photo?: File | null;
     count?: number | undefined;
     establishment?: string;
+    sorting_number: number;
+    additional_code?: string;
   }
   
   interface IMenuList {
     id: number;
     menu_title: string;
-    photo: string;
+    photo?: File | null;
     categories: {
       id: number;
       category_title: string;
       products: IProducts[];
+      sorting_number: number;
     } [];
-    establishment: number;
+    establishment: string;
   };
   
   interface IMenu {
     id: string;
     menu_title: string;
     photo?: File | null;
-    establishment: number;
+    establishment: string;
     categories?: [];
+    sorting_number?: string;
   }
 
   interface ICategory {
     id: string;
     category_title: string;
     photo?: string | '';
-    establishment?: number;
+    establishment?: string;
     products?: IProducts[];
   }
 
@@ -60,8 +64,8 @@
     default_color: string | '#000000',
     secondary_color?: boolean | true,
     description?: string,
-    photo?: string,
-    backgroundImage?: string,
+    photo?: File | null,
+    backgroundImage?: File | null,
     address?: string,
     workTime?: string,
     phoneNumber?: string,

@@ -1,9 +1,8 @@
 import { useEffect, useState, Fragment, useRef } from 'react';
-import { useFetching } from './..//hooks/useFetching';
-import { Dictionary, Establishment, SetDict } from '../api/api';
+import { useFetching } from '../hooks/useFetching';
+import { Dictionary, Establishment, SetDict, User } from '../api/api';
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { FaGripVertical, FaPlus, FaStop, FaTrash } from 'react-icons/fa6';
-import ThemeDivider from '../ui/ThemeDivider';
 import {ThemeInputNumber, ThemeInputText, ThemeSwitcher, ThemeTextarea} from '../ui/ThemeForms';
 import { BACK_HOST } from '../configs/config';
 import { FaPen } from 'react-icons/fa6';
@@ -12,8 +11,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Dialog, Transition } from '@headlessui/react'
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { isFile } from '../utils/ifFile';
+import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
+import { getCookie } from '../utils/cookie';
+import DialogModal from '../ui/DialogModal';
 
-export default function MenuEditPage() {
+
+export default function SettingsMenuPage() {
     const [productList, setProductList] = useState<IProducts[]>([]);
     const [menuList, setMenuList] = useState<IMenuList[]>([]);
     const [categoryList, setCategoryList] = useState<ICategory[]>([]);
@@ -32,16 +36,27 @@ export default function MenuEditPage() {
     const [isDeleteWarningProductModalOpen, setIsDeleteWarningProductModalOpen] = useState<boolean>(false);
     const [sortProductList, setSortProductList] = useState<IProducts[]>([]);
     const [sortCategoryList, setSortCategoryList] = useState<ICategory[]>([]);
+    const [establishmentId, setEstablishementId] = useState<string>('0');
 
-    const product: IProducts = ({id: '', description: 'Описание нового блюда', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory});
+    let navigate = useNavigate();
+
+    const product: IProducts = ({id: '', description: 'Описание нового блюда', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory, sorting_number: 0, establishment: establishmentId});
+
+    const [checkToken] = useFetching(async () => {
+        const response = await User.checkToken().then((res)=>{
+            if(!res.data.status){
+                return navigate("/login");
+            }
+        })
+    });
 
     const [getEstablishmentInfomation, isProductInfomationLoading, isProductInfomationError] = useFetching(async () => {
-        const response = await Establishment.getEstablishmentInformationById('2' || '0');
+        const response = await Establishment.getEstablishmentInformationById(establishmentId);
         setEstablishment(response.data.establishment);
     });
 
     const [getMenuList, isGetMenuListLoading, isGetMenuListError] = useFetching(async () => {
-        const response = await Dictionary.getMenuListByEstablishmentId('2');
+        const response = await Dictionary.getMenuListByEstablishmentId(establishmentId);
         setMenuList(response.data.menus);
     });
 
@@ -100,11 +115,32 @@ export default function MenuEditPage() {
         theme: "light",
     });
 
+    const notifyEdited = () => toast.success("Данные по блюду изменены ", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+        theme: "light",
+    });
+
     
     useEffect(()=>{
-        getEstablishmentInfomation();
+        checkToken().then(()=>{
+            setEstablishementId(getCookie('establishment_id') || '');
+        });
+    },[]);
+
+    useEffect(()=>{
+        if(establishmentId !== '0'){
+            getEstablishmentInfomation();
+        }
+        
+    },[establishmentId])
+
+    useEffect(()=>{
         getMenuList();
-    },[])
+    },[establishment])
 
     function SaveAlert () {
         setIsSaveProductModalOpen(true);
@@ -171,84 +207,80 @@ export default function MenuEditPage() {
     return (
         <div className='flex w-full justify-center'>
             <ToastContainer/>
-            <div className='bg-white max-w-[1366px] w-full border-gray-200 border p-5'>
-                <button className={`bg-green-700 py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`}>
-                    Общие
-                </button>
-                <button className={`bg-green-700 py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`}>
-                    Меню
-                </button>
-                <ThemeDivider pt={3} pb={3}/>
-                <div className='flex flex-row w-full items-center gap-3'>
-                    <span>Выберите меню:</span>
-                    <div className="inline-block relative w-64">
-                        <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" 
-                            onChange={(e)=>{isChanged ?  SaveAlert() : setSelectedMenu(e.target.value)}}>
-                            <option value={'0'}>Выберите меню из списка</option>
-                            {
-                                menuList.map((menuItem, index)=>
-                                    <option value={menuItem.id} key={menuItem.id}>{menuItem.menu_title}</option>
-                                )
-                            }
-                        </select>
-                        
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                        </div>
-                    </div>
-                    <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>{setIsMenuAddModalOpen(true)}}>
-                        <FaPlus/>
-                    </button>
-                    {
-                        selectedMenu !== '0' &&
-                        <button className='p-1 bg-blue-500 rounded-md text-white me-1' onClick={()=>{setIsMenuEditModalOpen(true)}}>
-                            <FaPen/>
-                        </button>
-                    }
-                </div>
-                <div className='flex md:flex-row flex-col mt-5 gap-4'>
-                    <div className='md:w-[250px] w-full h-auto overflow-auto'>
-                        <div className='flex flex-row bg-gray-200 p-3 rounded-md font-semibold justify-between items-center'>
-                            <div className='flex flex-row'>
+            <div className='bg-white max-w-[1366px] w-full border-gray-200 border'>
+                <Header page={'menu'}/>
+                <div className='p-5'>
+                    <div className='flex flex-row w-full items-center gap-3'>
+                        <span>Выберите меню:</span>
+                        <div className="inline-block relative w-64">
+                            <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" 
+                                onChange={(e)=>{isChanged ?  SaveAlert() : setSelectedMenu(e.target.value)}}>
+                                <option value={'0'}>Выберите меню из списка</option>
                                 {
-                                    selectedMenu !== '0' && 
-                                    <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>setIsCategoryAddModalOpen(true)}>
-                                        <FaPlus/>
-                                    </button>
+                                    menuList.map((menuItem, index)=>
+                                        <option value={menuItem.id} key={menuItem.id}>{menuItem.menu_title}</option>
+                                    )
                                 }
-                                Категории
+                            </select>
+                            
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </div>
-                            {
-                                selectedCategory !== '0' &&
-                                <div className='flex flex-row gap-1'>
-                                    <button className='p-1 bg-blue-500 rounded-md text-white' onClick={()=>{setIsCategoryEditModalOpen(true)}}>
-                                        <FaPen/>
-                                    </button>
-                                </div>
-                            }
                         </div>
-                        <EstablishmentCategoryList categoryList={categoryList} onDragEndCategoryList={onDragEndCategoryList} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} isChanged={isChanged} SaveAlert={SaveAlert}/>
+                        <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>{setIsMenuAddModalOpen(true)}}>
+                            <FaPlus/>
+                        </button>
+                        {
+                            selectedMenu !== '0' &&
+                            <button className='p-1 bg-blue-500 rounded-md text-white me-1' onClick={()=>{setIsMenuEditModalOpen(true)}}>
+                                <FaPen/>
+                            </button>
+                        }
                     </div>
-                    <div className='md:w-[350px] w-full'>
-                        <div className='flex flex-row bg-gray-200 p-3 rounded-md font-semibold justify-between items-center'>
-                            <div className='flex flex-row'>
+                    <div className='flex md:flex-row flex-col mt-5 gap-4'>
+                        <div className='md:w-[250px] w-full h-auto overflow-auto'>
+                            <div className='flex flex-row bg-gray-200 p-3 rounded-md font-semibold justify-between items-center'>
+                                <div className='flex flex-row'>
+                                    {
+                                        selectedMenu !== '0' && 
+                                        <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>setIsCategoryAddModalOpen(true)}>
+                                            <FaPlus/>
+                                        </button>
+                                    }
+                                    Категории
+                                </div>
                                 {
                                     selectedCategory !== '0' &&
-                                    <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>{addProduct()}}>
-                                        <FaPlus/>
-                                    </button>
+                                    <div className='flex flex-row gap-1'>
+                                        <button className='p-1 bg-blue-500 rounded-md text-white' onClick={()=>{setIsCategoryEditModalOpen(true)}}>
+                                            <FaPen/>
+                                        </button>
+                                    </div>
                                 }
-                                
-                                Блюда
                             </div>
+                            <EstablishmentCategoryList categoryList={categoryList} onDragEndCategoryList={onDragEndCategoryList} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} isChanged={isChanged} SaveAlert={SaveAlert}/>
                         </div>
-                        <EstablishmentProductList productList={productList} onDragEndProductList={onDragEndProductList} selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} isChanged={isChanged} SaveAlert={SaveAlert}/>
-                    </div>
-                    <div className='flex-grow'>
-                        {
-                            selectedProduct !== '0' && 
-                            <ProductCardEdit isChanged={isChanged} setIsChanged={setIsChanged} selectedProduct={selectedProduct} notifyCancel={notifyCancel} notifySave={notifySave} establishment={establishment} getProductList={getProductList} setIsDeleteWarningProductModalOpen={setIsDeleteWarningProductModalOpen}/>
-                        }
+                        <div className='md:w-[350px] w-full'>
+                            <div className='flex flex-row bg-gray-200 p-3 rounded-md font-semibold justify-between items-center'>
+                                <div className='flex flex-row'>
+                                    {
+                                        selectedCategory !== '0' &&
+                                        <button className='p-1 bg-green-500 rounded-md text-white me-1' onClick={()=>{addProduct()}}>
+                                            <FaPlus/>
+                                        </button>
+                                    }
+                                    
+                                    Блюда
+                                </div>
+                            </div>
+                            <EstablishmentProductList productList={productList} onDragEndProductList={onDragEndProductList} selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} isChanged={isChanged} SaveAlert={SaveAlert}/>
+                        </div>
+                        <div className='flex-grow'>
+                            {
+                                selectedProduct !== '0' && 
+                                <ProductCardEdit isChanged={isChanged} setIsChanged={setIsChanged} selectedProduct={selectedProduct} notifyCancel={notifyCancel} notifyEdited={notifyEdited} getProductList={getProductList} setIsDeleteWarningProductModalOpen={setIsDeleteWarningProductModalOpen} establishmentId={establishmentId}/>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,16 +297,16 @@ export default function MenuEditPage() {
                 <DeleteProductWarning setIsDeleteWarningProductModalOpen={setIsDeleteWarningProductModalOpen} selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} getProductList={getProductList} setIsChanged={setIsChanged}/>
             </DialogModal>
             <DialogModal isOpen={isMenuAddModalOpen} setIsOpen={setIsMenuAddModalOpen}>
-                <MenuAddModalContent setIsMenuAddModalOpen={setIsMenuAddModalOpen} getMenuList={getMenuList} selectedMenu={selectedMenu}/>
+                <MenuAddModalContent setIsMenuAddModalOpen={setIsMenuAddModalOpen} getMenuList={getMenuList} selectedMenu={selectedMenu} establishmentId={establishmentId}/>
             </DialogModal>
             <DialogModal isOpen={isMenuEditModalOpen} setIsOpen={setIsMenuEditModalOpen}>
-                <MenuEditModalContent setIsMenuEditModalOpen={setIsMenuEditModalOpen} getMenuList={getMenuList} selectedMenu={selectedMenu} setIsDeleteWarningModalOpen={setIsDeleteWarningMenuModalOpen}/>
+                <MenuEditModalContent setIsMenuEditModalOpen={setIsMenuEditModalOpen} getMenuList={getMenuList} selectedMenu={selectedMenu} setIsDeleteWarningModalOpen={setIsDeleteWarningMenuModalOpen} establishmentId={establishmentId}/>
             </DialogModal>
             <DialogModal isOpen={isCategoryAddModalOpen} setIsOpen={setIsCategoryAddModalOpen}>
-                <CategoryAddModalContent setIsCategoryAddModalOpen={setIsCategoryAddModalOpen} getCategoryList={getCategoryList} selectedCategory={selectedCategory} selectedMenu={selectedMenu}/>
+                <CategoryAddModalContent setIsCategoryAddModalOpen={setIsCategoryAddModalOpen} getCategoryList={getCategoryList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} establishmentId={establishmentId}/>
             </DialogModal>
             <DialogModal isOpen={isCategoryEditModalOpen} setIsOpen={setIsCategoryEditModalOpen}>
-                <CategoryEditModalContent setIsCategoryEditModalOpen={setIsCategoryEditModalOpen} getCategoryList={getCategoryList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setIsDeleteWarningCategoryModalOpen={setIsDeleteWarningCategoryModalOpen}/>
+                <CategoryEditModalContent setIsCategoryEditModalOpen={setIsCategoryEditModalOpen} getCategoryList={getCategoryList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setIsDeleteWarningCategoryModalOpen={setIsDeleteWarningCategoryModalOpen} establishmentId={establishmentId}/>
             </DialogModal>
         </div>
     )
@@ -357,44 +389,6 @@ const EstablishmentProductList = ({onDragEndProductList, productList, selectedPr
     );
 }
 
-const DialogModal = ({isOpen, setIsOpen, children}:{isOpen: boolean, setIsOpen: Function, children: React.ReactNode}) => {
-    return(
-        <Transition.Root show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={()=>setIsOpen(false)}>
-                <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-                </Transition.Child>
-
-                <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100 translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                                {children}
-                            </Dialog.Panel>
-                        </Transition.Child>
-                    </div>
-                </div>
-            </Dialog>
-        </Transition.Root>
-    );
-}
-
 const SaveChangesOfProductModalContent = ({setIsSaveProductModalOpen}:{setIsSaveProductModalOpen: Function}) => {
     return (
         <>
@@ -428,8 +422,8 @@ const SaveChangesOfProductModalContent = ({setIsSaveProductModalOpen}:{setIsSave
     );
 };
 
-const MenuAddModalContent = ({setIsMenuAddModalOpen, getMenuList, selectedMenu}:{setIsMenuAddModalOpen: Function, getMenuList: Function, selectedMenu: string}) => {
-    const [newMenu, setNewMenu] = useState<IMenu>({id: selectedMenu, menu_title: '', establishment: 2, photo: null});
+const MenuAddModalContent = ({setIsMenuAddModalOpen, getMenuList, selectedMenu, establishmentId}:{setIsMenuAddModalOpen: Function, getMenuList: Function, selectedMenu: string, establishmentId: string}) => {
+    const [newMenu, setNewMenu] = useState<IMenu>({id: selectedMenu, menu_title: '', establishment: establishmentId, photo: null});
     const formData = new FormData();
 
     const menuCreatedNotify = () => toast.success("Меню создано", {
@@ -518,8 +512,8 @@ const MenuAddModalContent = ({setIsMenuAddModalOpen, getMenuList, selectedMenu}:
     );
 }
 
-const MenuEditModalContent = ({setIsMenuEditModalOpen, getMenuList, selectedMenu, setIsDeleteWarningModalOpen}:{setIsMenuEditModalOpen: Function, getMenuList: Function, selectedMenu: string, setIsDeleteWarningModalOpen: Function}) => {
-    const [menu, setMenu] = useState<IMenu>({id: selectedMenu, menu_title: '2', establishment: 2, photo: null});
+const MenuEditModalContent = ({setIsMenuEditModalOpen, getMenuList, selectedMenu, setIsDeleteWarningModalOpen, establishmentId}:{setIsMenuEditModalOpen: Function, getMenuList: Function, selectedMenu: string, setIsDeleteWarningModalOpen: Function, establishmentId: string}) => {
+    const [menu, setMenu] = useState<IMenu>({id: selectedMenu, menu_title: '2', establishment: establishmentId, photo: null});
     const [img, setImg] = useState<string>('');
     const formData = new FormData();
 
@@ -554,6 +548,7 @@ const MenuEditModalContent = ({setIsMenuEditModalOpen, getMenuList, selectedMenu
         e.preventDefault();
         formData.append('menu_title', menu.menu_title);
         formData.append('establishment', menu.establishment.toString());
+        formData.append('sorting_number', menu.sorting_number || '');
 
         if (isFile(menu.photo)) {
             formData.append('photo', menu.photo);
@@ -597,6 +592,8 @@ const MenuEditModalContent = ({setIsMenuEditModalOpen, getMenuList, selectedMenu
                                 <div className='flex-grow'>
                                     <p>Название меню</p>
                                     <ThemeInputText value={menu.menu_title} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMenu((menu: IMenu)=>({...menu, menu_title: event.target.value}))} required/>
+                                    <p className='mt-4'>Порядковый номер</p>
+                                    <ThemeInputNumber value={menu.sorting_number || ''} onChange={(event: React.ChangeEvent<HTMLInputElement>) => setMenu((menu: IMenu)=>({...menu, sorting_number: event.target.value}))} required/>
                                     <p className='mt-4'>Изменить изображение</p>
                                     <input 
                                         type="file" 
@@ -643,8 +640,8 @@ const MenuEditModalContent = ({setIsMenuEditModalOpen, getMenuList, selectedMenu
     );
 }
 
-const CategoryAddModalContent = ({setIsCategoryAddModalOpen, selectedCategory, getCategoryList, selectedMenu}:{setIsCategoryAddModalOpen: Function, selectedCategory: string, getCategoryList: Function, selectedMenu: string}) => {
-    const [newCategory, setNewCategory] = useState<ICategory>({id: selectedCategory, category_title: '', establishment: 2});
+const CategoryAddModalContent = ({setIsCategoryAddModalOpen, selectedCategory, getCategoryList, selectedMenu, establishmentId}:{setIsCategoryAddModalOpen: Function, selectedCategory: string, getCategoryList: Function, selectedMenu: string, establishmentId: string}) => {
+    const [newCategory, setNewCategory] = useState<ICategory>({id: selectedCategory, category_title: '', establishment: establishmentId});
     const formData = new FormData();
 
     const categoryCreatedNotify = () => toast.success("Категория была успешно добавлена", {
@@ -663,10 +660,6 @@ const CategoryAddModalContent = ({setIsCategoryAddModalOpen, selectedCategory, g
             getCategoryList();
         });
     });
-
-    useEffect(()=>{
-        console.log(newCategory);
-    },[newCategory])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -714,8 +707,8 @@ const CategoryAddModalContent = ({setIsCategoryAddModalOpen, selectedCategory, g
     );
 }
 
-const CategoryEditModalContent = ({setIsCategoryEditModalOpen, selectedCategory, getCategoryList, selectedMenu, setIsDeleteWarningCategoryModalOpen}:{setIsCategoryEditModalOpen: Function, selectedCategory: string, getCategoryList: Function, selectedMenu: string, setIsDeleteWarningCategoryModalOpen: Function}) => {
-    const [category, setCategory] = useState<ICategory>({id: selectedCategory, category_title: '', establishment: 2});
+const CategoryEditModalContent = ({setIsCategoryEditModalOpen, selectedCategory, getCategoryList, selectedMenu, setIsDeleteWarningCategoryModalOpen, establishmentId}:{setIsCategoryEditModalOpen: Function, selectedCategory: string, getCategoryList: Function, selectedMenu: string, setIsDeleteWarningCategoryModalOpen: Function, establishmentId: string}) => {
+    const [category, setCategory] = useState<ICategory>({id: selectedCategory, category_title: '', establishment: establishmentId});
     const formData = new FormData();
 
     const categoryChangedNotify = () => toast.success("Категория была успешно изменена", {
@@ -743,10 +736,6 @@ const CategoryEditModalContent = ({setIsCategoryEditModalOpen, selectedCategory,
     useEffect(()=>{
         getCategory();
     },[]);
-
-    useEffect(()=>{
-        console.log(category);
-    },[category])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -807,8 +796,8 @@ const CategoryEditModalContent = ({setIsCategoryEditModalOpen, selectedCategory,
     );
 }
 
-const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifySave, selectedProduct, establishment, getProductList, setIsDeleteWarningProductModalOpen}:{isChanged: boolean, setIsChanged: Function, notifyCancel: Function, notifySave: Function, selectedProduct: string, establishment?: IEstablishment, getProductList: Function, setIsDeleteWarningProductModalOpen: Function}) => {
-    const [product, setProduct] = useState<IProducts>({description: '', id: selectedProduct, is_active: true, is_published: false, old_price: 0, price: 0, title: '', category: '0'});
+const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, selectedProduct, getProductList, setIsDeleteWarningProductModalOpen, establishmentId}:{isChanged: boolean, setIsChanged: Function, notifyCancel: Function, notifyEdited: Function, selectedProduct: string, getProductList: Function, setIsDeleteWarningProductModalOpen: Function, establishmentId: string}) => {
+    const [product, setProduct] = useState<IProducts>({description: '', id: selectedProduct, is_active: true, is_published: false, old_price: 0, price: 0, title: '', category: '0', sorting_number: 0, establishment: establishmentId});
     const [img, setImg] = useState<string>('');
     const formData = new FormData();
 
@@ -828,10 +817,10 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifySave, sel
     const [editProduct, isEditProductLoading, isEditProductError] = useFetching(async () => {
         const response = await SetDict.editProductByCategory(formData, selectedProduct)
         .then(()=>{
-           notifySave();
-           setIsChanged(false); 
-           getProductList();
-           getProduct();
+            notifyEdited();
+            setIsChanged(false); 
+            getProductList();
+            getProduct();
         })
         .catch((e)=>{
             console.error(e);
