@@ -26,7 +26,7 @@ export default function AuthorizationPage() {
     });
 
     const [getAuthToken, isGetAuthTokenLoading] = useFetching(async () => {
-        const response = await User.getToken(userForm)
+        await User.getToken(userForm)
         .then((value)=>{
             setCookie('token', value.data.auth_token);
             notifySuccess();
@@ -36,22 +36,22 @@ export default function AuthorizationPage() {
             },2000);
             getEstablishmentIdByToken();
         })
-        .catch((error)=>{
+        .catch(()=>{
             setError(true);
         });
     });
 
     const [getEstablishmentIdByToken] = useFetching(async () => {
-        const response = await User.getEstablishmentIdByToken()
+        await User.getEstablishmentIdByToken()
         .then((value)=>{
             setCookie('establishment_id', value.data.establishment_id);
         })
-        .catch((error)=>{
+        .catch(()=>{
         });
     });
 
     const [checkToken] = useFetching(async () => {
-        const response = await User.checkToken().then((res)=>{
+        await User.checkToken().then((res)=>{
             if(res.data.status){
                 return navigate("/settings/menu/");
             }

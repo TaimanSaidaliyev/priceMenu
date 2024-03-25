@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { useEffect, useState } from 'react'
+import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom'
 import { deleteCookie, getCookie } from '../utils/cookie'
@@ -26,14 +26,14 @@ export default function Header({page}:{page: string}) {
       
 
     const [checkToken] = useFetching(async () => {
-        const response = await User.checkToken().then((res)=>{
+        await User.checkToken().then((res)=>{
             if(!res.data.status){
                 return navigate("/login");
             }
         })
     });
 
-    const [getEstablishmentInfomation, isProductInfomationLoading, isProductInfomationError] = useFetching(async () => {
+    const [getEstablishmentInfomation] = useFetching(async () => {
         const response = await Establishment.getEstablishmentInformationById(establishmentId);
         setEstablishment(response.data.establishment);
     });

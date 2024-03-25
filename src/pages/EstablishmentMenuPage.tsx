@@ -9,7 +9,7 @@ import { Establishment } from './..//api/api';
 import { BACK_HOST } from './..//configs/config';
 import { format } from 'date-fns';
 import BounceLoader from "react-spinners/BounceLoader";
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import FullSizeModal from '../ui/FullSizeModal';
 import { stringifyArray } from '../parser/parser';
 import { FaInstagram } from 'react-icons/fa';
@@ -45,18 +45,18 @@ function EstablishmentMenuPage() {
   const [banners, setBanners] = useState<IBanners[]>([]);
   const [promotions, setPromotions] = useState<IPromotions[]>([]);
 
-  const [getEstablishmentInfomation, isProductInfomationLoading, isProductInfomationError] = useFetching(async () => {
+  const [getEstablishmentInfomation] = useFetching(async () => {
     const response = await Establishment.getEstablishmentInformationById(establishment_id || '0');
     setEstablishment(response.data.establishment);
   });
 
-  const [getProductList, isGetProductListLoading, isGetProductListError] = useFetching(async () => {
+  const [getProductList, isGetProductListLoading] = useFetching(async () => {
     const response = await Establishment.getEstablishmentProductList(establishment_id || '0');
     setProductList(response.data.list);
     setSelectedMenu(response.data.list[0].id || 0);
   });
 
-  const [getPromotionsList, isGetPromotionsListLoading, isGetPromotionsListError] = useFetching(async () => {
+  const [getPromotionsList, isGetPromotionsListLoading] = useFetching(async () => {
     const response = await Establishment.getEstablishmentPromotions(establishment_id || '0');
     setPromotions(response.data.promotions);
     setBanners(response.data.promotions);
@@ -80,6 +80,10 @@ function EstablishmentMenuPage() {
     setCartProducts(filteredProductList);
     setTotal({totalPrice: totalPrice, totalCount: totalCount});
   },[productList]);
+
+  useEffect(() => {
+    document.title = 'Меню заведения ' + establishment?.title;
+  }, [establishment]);
 
   const incrementCount = (menuId: number, categoryId: number, productId: string, operations: boolean) => {
     setProductList((prevProductList) => {
@@ -145,7 +149,7 @@ function EstablishmentMenuPage() {
             <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
             <SearchFiled searchText={searchText} setSearchText={setSearchText}/>
             {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
-            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
+            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal}/>
             <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
             <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
             <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
@@ -279,40 +283,40 @@ const SearchFiled = ({searchText, setSearchText} : {searchText: string, setSearc
   );
 };
 
-const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment}) => {
-  return (
-    <>
-    <div className='w-full flex flex-row overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
-        {
-          productList
-          .filter(menu => menu.id === selectedMenu)
-          .map((menu, index)=>
-          <React.Fragment key={index}>
-            {
-              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
-              <div key={index}>
-                {
-                  category.id === selectedCategory ?
-                  <button className={`py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
-                    {category.category_title}
-                  </button>
-                  :
-                  <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
-                    {category.category_title}
-                  </button>
-                }
-              </div>
-              )
-            }
-          </React.Fragment>
-          )
-        }
-    </div>
-    </>
-  );
-};
+// const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment}) => {
+//   return (
+//     <>
+//     <div className='w-full flex flex-row overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
+//         {
+//           productList
+//           .filter(menu => menu.id === selectedMenu)
+//           .map((menu, index)=>
+//           <React.Fragment key={index}>
+//             {
+//               menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
+//               <div key={index}>
+//                 {
+//                   category.id === selectedCategory ?
+//                   <button className={`py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
+//                     {category.category_title}
+//                   </button>
+//                   :
+//                   <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
+//                     {category.category_title}
+//                   </button>
+//                 }
+//               </div>
+//               )
+//             }
+//           </React.Fragment>
+//           )
+//         }
+//     </div>
+//     </>
+//   );
+// };
 
-const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount, setShowCategoryModal, showCategoryModal}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function, setShowCategoryModal: Function, showCategoryModal: boolean }) => {
+const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount, setShowCategoryModal}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function, setShowCategoryModal: Function }) => {
   if(establishment?.menu_view_type === "List"){
     return (
       <div className='w-full p-5 pb-[100px]'>
