@@ -5,6 +5,7 @@ import { setCookie } from "../utils/cookie";
 import MoonLoader from "react-spinners/MoonLoader";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { WEBSITE_NAME } from "../configs/config";
 
 interface IUserForm {
     username: string;
@@ -12,6 +13,7 @@ interface IUserForm {
 }
 
 export default function AuthorizationPage() {
+    document.title = WEBSITE_NAME + 'Страница авторизации';
     let navigate = useNavigate();
     const [userForm, setUserForm] = useState<IUserForm>({username: '', password: ''});
     const [error, setError] = useState<boolean>(false);
@@ -77,11 +79,11 @@ export default function AuthorizationPage() {
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img
-                    className="mx-auto h-10 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                    className="mx-auto h-20 w-auto"
+                    src="/public/img/logo_qr.png"
                     alt="Your Company"
                 />
-                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                     Цифровизация вашего меню
                 </h2>
             </div>
@@ -135,7 +137,6 @@ export default function AuthorizationPage() {
                         }
                         
                     </div>
-
                     <div>
                         <button
                             type="submit"

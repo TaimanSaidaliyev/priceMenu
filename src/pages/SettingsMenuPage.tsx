@@ -4,7 +4,7 @@ import { Dictionary, Establishment, SetDict, User } from '../api/api';
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
 import { FaGripVertical, FaPlus, FaStop, FaTrash } from 'react-icons/fa6';
 import {ThemeInputNumber, ThemeInputText, ThemeSwitcher, ThemeTextarea} from '../ui/ThemeForms';
-import { BACK_HOST } from '../configs/config';
+import { BACK_HOST, WEBSITE_NAME } from '../configs/config';
 import { FaPen } from 'react-icons/fa6';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,6 +18,7 @@ import DialogModal from '../ui/DialogModal';
 
 
 export default function SettingsMenuPage() {
+    document.title = WEBSITE_NAME + 'Настройки меню';
     const [productList, setProductList] = useState<IProducts[]>([]);
     const [menuList, setMenuList] = useState<IMenuList[]>([]);
     const [categoryList, setCategoryList] = useState<ICategory[]>([]);

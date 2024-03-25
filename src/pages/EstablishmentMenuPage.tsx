@@ -6,7 +6,7 @@ import QRCode from 'react-qr-code';
 import formatPrice from './../utils/formatPrice';
 import { useFetching } from './..//hooks/useFetching';
 import { Establishment } from './..//api/api';
-import { BACK_HOST } from './..//configs/config';
+import { BACK_HOST, WEBSITE_NAME } from './..//configs/config';
 import { format } from 'date-fns';
 import BounceLoader from "react-spinners/BounceLoader";
 import { useParams } from 'react-router-dom';
@@ -34,12 +34,28 @@ function EstablishmentMenuPage() {
     }
   ]);
   const [selectedMenu, setSelectedMenu] = useState<number>(productList[0].id || 0);
+  const [product, setProduct] = useState<IProducts>({
+    id: '',
+    title: '',
+    category: '',
+    description: '',
+    price: 0,
+    old_price: 0,
+    is_active: true,
+    is_published: true,
+    photo: null,
+    count: 0,
+    establishment: '',
+    sorting_number: 0,
+    additional_code: ''
+  });
   const [selectedCategory, setSelectedCategory] = useState<number>(productList[0].id || 0);
   const [cartProducts, setCartProducts] = useState<IMenuList[]>([]);
   const [total, setTotal] = useState({totalPrice: 0, totalCount: 0});
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+  const [showProductModal, setShowProductModal] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>('');
   const [establishment, setEstablishment] = useState<IEstablishment>();
   const [banners, setBanners] = useState<IBanners[]>([]);
@@ -82,7 +98,7 @@ function EstablishmentMenuPage() {
   },[productList]);
 
   useEffect(() => {
-    document.title = 'Меню заведения ' + establishment?.title;
+    document.title = WEBSITE_NAME + 'Меню заведения ' + establishment?.title;
   }, [establishment]);
 
   const incrementCount = (menuId: number, categoryId: number, productId: string, operations: boolean) => {
@@ -149,11 +165,12 @@ function EstablishmentMenuPage() {
             <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
             <SearchFiled searchText={searchText} setSearchText={setSearchText}/>
             {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
-            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal}/>
+            <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} isGetProductListLoading={isGetProductListLoading} showProductModal={showProductModal} setShowProductModal={setShowProductModal} setProduct={setProduct}/>
             <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
             <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
             <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
             <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
+            <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount}/>
         </div>
       </div>
     </>
@@ -163,7 +180,10 @@ function EstablishmentMenuPage() {
 const PageHeader = ({ establishment, setShowInfoModal }: { establishment?: IEstablishment, setShowInfoModal: Function }) => {
   return (
     <div className='relative'>
-      <img src={`${BACK_HOST + establishment?.backgroundImage}`} className='object-cover h-[125px] w-full brightness-50 pointer-events-none'/>
+      {
+        establishment?.backgroundImage != null &&
+        <img src={`${BACK_HOST + establishment?.backgroundImage}`} className='object-cover h-[125px] w-full brightness-50 pointer-events-none'/>
+      }
       <p className='absolute bottom-0 text-xl text-white font-semibold mb-3 ms-5'>
         <div className='flex flex-row items-center'>
             {establishment?.title || ''} 
@@ -190,7 +210,24 @@ const BannersPromotions = ({searchText, establishment, banners, promotions, isLo
     <>
       {
         isLoading ?
-          <SpinnerLoading color={establishment?.default_color}/>
+          // <SpinnerLoading color={establishment?.default_color}/>
+          <>
+          <div className="animate-pulse flex flex-row w-full overflow-y-scroll no-scrollbar h-[150px] pe-5 mt-3">
+            <div className="rounded-lg ms-5 h-[150px] w-[280px] bg-gray-200"></div>
+            <div className="rounded-lg ms-5 h-[150px] w-[280px] bg-gray-200"></div>
+            <div className="rounded-lg ms-5 h-[150px] w-[280px] bg-gray-200"></div>
+          </div>
+          <div className='w-full px-5 pt-5'>
+            <div className="w-full animate-pulse">
+              <div> 
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-1">
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-full">
+                </div>
+              </div>
+            </div>
+          </div>
+          </>
         :
         <>
           {
@@ -239,7 +276,18 @@ const MenuBlock = ({ establishment, productList, selectedMenu, setSelectedMenu, 
     <>
     {
       isLoading ?
-      <SpinnerLoading color={establishment?.default_color}/>
+      <div className='flex flex-row w-full overflow-y-scroll no-scrollbar px-5 mt-2 animate-pulse'>
+        <div className='w-[130px] p-3 rounded-xl text-center me-3 h-[170px]'>
+          <div className='object-cover w-[100px] h-[100px] rounded-full mx-auto bg-gray-200'>
+          </div>
+          <div className='mt-1 text-sm font-semibold h-4 bg-gray-200'></div>
+        </div>
+        <div className='w-[120px] p-3 rounded-xl text-center me-3 h-[170px]'>
+          <div className='object-cover  w-[100px] h-[100px] rounded-full mx-auto bg-gray-200'>
+          </div>
+          <div className='mt-1 h-4 bg-gray-200'></div>
+        </div>
+      </div>
       :
       <>
         {
@@ -283,40 +331,76 @@ const SearchFiled = ({searchText, setSearchText} : {searchText: string, setSearc
   );
 };
 
-// const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment}) => {
-//   return (
-//     <>
-//     <div className='w-full flex flex-row overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
-//         {
-//           productList
-//           .filter(menu => menu.id === selectedMenu)
-//           .map((menu, index)=>
-//           <React.Fragment key={index}>
-//             {
-//               menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
-//               <div key={index}>
-//                 {
-//                   category.id === selectedCategory ?
-//                   <button className={`py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
-//                     {category.category_title}
-//                   </button>
-//                   :
-//                   <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
-//                     {category.category_title}
-//                   </button>
-//                 }
-//               </div>
-//               )
-//             }
-//           </React.Fragment>
-//           )
-//         }
-//     </div>
-//     </>
-//   );
-// };
+const ProductCategoriesButtons = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment}) => {
+  return (
+    <>
+    <div className='w-full flex flex-row overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
+        {
+          productList
+          .filter(menu => menu.id === selectedMenu)
+          .map((menu, index)=>
+          <React.Fragment key={index}>
+            {
+              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
+              <div key={index}>
+                {
+                  category.id === selectedCategory ?
+                  <button className={`py-2 px-4 rounded-3xl text-white font-semibold me-2 whitespace-nowrap`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id)}}>
+                    {category.category_title}
+                  </button>
+                  :
+                  <button className="bg-white py-2 px-4 rounded-3xl text-gray-500 font-semibold me-2 whitespace-nowrap border border-gray-200" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`}}>
+                    {category.category_title}
+                  </button>
+                }
+              </div>
+              )
+            }
+          </React.Fragment>
+          )
+        }
+    </div>
+    </>
+  );
+};
 
-const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount, setShowCategoryModal}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function, setShowCategoryModal: Function }) => {
+const ProductList = ({productList, selectedMenu, searchText, establishment, incrementCount, setShowCategoryModal, isGetProductListLoading, showProductModal, setShowProductModal, setProduct}:{productList: IMenuList[], selectedMenu: number, searchText: string, establishment?: IEstablishment, incrementCount: Function, setShowCategoryModal: Function, isGetProductListLoading: boolean, showProductModal: boolean, setShowProductModal: Function, setProduct: Function }) => {
+  if(isGetProductListLoading){
+    return(
+      <div className='w-full p-5 pb-[100px] animate-pulse'>
+        <div>
+          <div>
+            <div>
+              <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1'>
+                <div className='h-6 bg-gray-200 rounded w-1/4 my-3'></div>
+                <div className='h-6 bg-gray-200 rounded w-4'></div>
+              </div>
+            </div>
+            <div className='flex w-full py-3'>
+              <div className='me-3 w-[150px]'>
+                <div className='h-24 bg-gray-200 rounded'></div>
+              </div>
+              <div className='w-full flex flex-col justify-between'>
+                <div>
+                  <div className='h-6 bg-gray-200 rounded w-3/4'></div>
+                  <div className='h-4 bg-gray-200 rounded w-1/2 mt-1'></div>
+                  <div className='h-4 bg-gray-200 rounded w-full mt-1'></div>
+                </div>
+                <div className='flex flex-row justify-between items-end'>
+                  <div className='flex flex-row items-end'>
+                    <div className='h-6 bg-gray-200 rounded w-16'></div>
+                    <div className='h-6 bg-gray-200 rounded w-16 ms-3'></div>
+                  </div>
+                  <div className='h-6 bg-gray-200 rounded w-16'></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
   if(establishment?.menu_view_type === "List"){
     return (
       <div className='w-full p-5 pb-[100px]'>
@@ -342,13 +426,27 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                       .sort((a, b) => a.sorting_number - b.sorting_number)
                       .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                       .map((product, indexProduct)=>
-                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'}`} key={indexProduct}>
+                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} `} key={indexProduct} onClick={()=>{setProduct(product); setShowProductModal(true)}}>
+                          <div className='relative'>
                           {
                             product.photo &&
-                            <div className='me-3 w-[150px]'>
-                              <img className='object-cover rounded-lg w-[150px] min-h-[130px] max-h-[180px]' src={`${BACK_HOST + product.photo}`}/>
-                            </div>     
+                            <>
+                              <div className='me-3 w-[110px]'>
+                                <img className='object-cover rounded-lg w-[110px] min-h-[100px] max-h-[180px]' src={`${BACK_HOST + product.photo}`}/>
+                              </div>
+                              {
+                                product.old_price > 0 &&
+                                <div className='rounded-md px-2 py-1 flex justify-center items-center absolute' style={{top: -2, right: 15, backgroundColor: establishment.default_color}}>
+                                  <span className='text-white'>
+                                    -{Math.round(((product.old_price - product.price)/product.old_price)*100)}%
+                                  </span>
+                                </div>
+                              }
+                              
+                            </>
                           }
+                          </div>
+                          
                           <div className='w-full flex flex-col justify-between'>
                             <div>
                               <p className='font-semibold text-lg line-clamp-3'>{product.title}</p>
@@ -360,10 +458,10 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                             </div>
                             <div className='flex flex-row justify-between items-end'>
                               <div className='flex flex-row items-end'>
-                                <span className='text-xl font-semibold' style={{color: establishment?.default_color}}>{formatPrice(product.price)}</span>
+                                <span className='text-lg font-semibold' style={{color: establishment?.default_color}}>{formatPrice(product.price)}</span>
                                 {
                                   product.old_price > 0 &&
-                                  <span className='text-lg text-gray-400 line-through ms-3'>{formatPrice(product.old_price)}</span>
+                                  <span className='text-base text-gray-400 line-through ms-2'>{formatPrice(product.old_price)}</span>
                                 }
                               </div>
                               {
@@ -373,7 +471,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                                     product.count !== undefined && product.count > 0 && 
                                     <>
                                       <FaCircleMinus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
-                                      <span className='text-xl font-semibold px-3'>{product.count}</span>
+                                      <span className='text-xl font-semibold px-1'>{product.count}</span>
                                     </>
                                   }
                                   <FaCirclePlus size={24} style={{color: establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
@@ -505,7 +603,7 @@ const ModalWindow = ({establishment, showModal, setShowModal, cartProducts, incr
           category.products.filter(product => product.count || 0 > 0)
       )
     );
-    setUrlQr('http://localhost:5173/list_for_waiter/?products=' + stringifyArray(productsWithCount));
+    setUrlQr(`https://${window.location.hostname}/list_for_waiter/?products=` + stringifyArray(productsWithCount));
     
     
   },[cartProducts]);
@@ -672,51 +770,34 @@ const ModalCategoryList = ({productList, selectedMenu, selectedCategory, setSele
   );
 }
 
-const ModalProductInfo = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment, showCategoryModal, setShowCategoryModal}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment, showCategoryModal: boolean, setShowCategoryModal: Function}) => {
+const ModalProductInfo = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment, showProductModal, setShowProductModal, product, incrementCount}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment, showProductModal: boolean, setShowProductModal: Function, product: IProducts, incrementCount: Function}) => {
   return (
-    <DialogModal isOpen={showCategoryModal} setIsOpen={setShowCategoryModal}>
-    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-5 py-2 sticky top-0 border-b-2 border-gray-200 bg-white'>
-        {
-          productList
-          .filter(menu => menu.id === selectedMenu)
-          .map((menu, index)=>
-          <React.Fragment key={index}>
+    <DialogModal isOpen={showProductModal} setIsOpen={setShowProductModal}>
+    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-2 py-2 border-b-2 border-gray-200'>
+        <img src={`${BACK_HOST}${product.photo}`} className={'object-cover max-h-[500px] rounded-md'}/>
+        <p className='mt-3 text-xl font-semibold'>{product.title}</p>
+
             {
-              menu.categories && menu.categories.sort((a, b) => a.sorting_number - b.sorting_number).map((category, index)=>
-              <div key={index}>
-                {
-                  category.id === selectedCategory ?
-                  <div className={`py-2 px-4 my-1 text-white font-semibold me-2 whitespace-nowrap w-[300px]`} style={{backgroundColor: establishment?.default_color}} key={index} onClick={()=>{setSelectedCategory(category.id); setShowCategoryModal(false)}}>
-                    {category.category_title}
-                  </div>
-                  :
-                  <div className="bg-white py-2 px-4 my-1 text-gray-500 font-semibold me-2 whitespace-nowrap w-[300px]" key={index} onClick={()=>{setSelectedCategory(category.id); window.location.href=`#${category.id}`; setShowCategoryModal(false);}}>
-                    {category.category_title}
-                  </div>
-                }
+              product.old_price > 0 &&
+              <div className='rounded-md px-2 py-1 flex justify-center items-center absolute' style={{top: 10, right: 10, backgroundColor: establishment?.default_color}}>
+                <span className='text-white text-xl'>
+                  -{Math.round(((product.old_price - product.price)/product.old_price)*100)}%
+                </span>
               </div>
-              )
             }
-          </React.Fragment>
-          )
-        }
+
+        <div className='flex flex-row items-end mt-3'>
+          <span className='text-2xl font-semibold' style={{color: establishment?.default_color}}>{formatPrice(product.price)}</span>
+          {
+            product.old_price > 0 &&
+            <span className='text-xl text-gray-400 line-through ms-2'>{formatPrice(product.old_price)}</span>
+          }
+        </div>
+        <p className='mt-3 text-md text-gray-600 '>{product.description}</p>
     </div>
     </DialogModal>
   );
 }
 
-const SpinnerLoading = ({color}:{color?: string}) => {
-  return (
-    <div className='flex justify-center text-center mt-2'>
-      <BounceLoader
-        color={color || '#555555'}
-        loading={true}
-        size={20}
-        aria-label="Loading Spinner"
-        data-testid="loader"
-      />
-    </div>
-  );
-};
 
 export default EstablishmentMenuPage;

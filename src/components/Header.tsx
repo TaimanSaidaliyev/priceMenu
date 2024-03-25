@@ -21,7 +21,6 @@ export default function Header({page}:{page: string}) {
     const navigation = [
         { name: 'Редактор меню', href: '/settings/menu/', current: page === 'menu' ? true : false },
         { name: 'Настройки', href: '/settings/general/', current: page === 'general' ? true : false },
-        { name: 'Перейти в меню', href: `/establishment/${establishment?.id}/`, current: page === 'menuList' ? true : false },
     ]   
       
 
@@ -78,7 +77,7 @@ export default function Header({page}:{page: string}) {
                         <div className="flex flex-shrink-0 items-center">
                         <img
                             className="h-8 w-auto"
-                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
+                            src="/public/img/logo_qr.png"
                             alt="Your Company"
                         />
                         </div>
@@ -97,6 +96,18 @@ export default function Header({page}:{page: string}) {
                                 {item.name}
                             </Link>
                             ))}
+                            <Link
+                                key={'Перейти в меню'}
+                                target='_blank'
+                                to={`/establishment/${establishment?.id}/`}
+                                className={classNames(
+                                    page === 'menuList' ? true : false ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                    'rounded-md px-3 py-2 text-sm font-medium'
+                                )}
+                                aria-current={page === 'menuList' ? true : false ? 'page' : undefined}
+                                >
+                                {'Перейти в меню'}
+                            </Link>
                         </div>
                         </div>
                     </div>
@@ -122,6 +133,18 @@ export default function Header({page}:{page: string}) {
                             {item.name}
                         </Link>
                     ))}
+                    <Link
+                        key={'Перейти в меню'}
+                        target='_blank'
+                        to={`/establishment/${establishment?.id}/`}
+                        className={classNames(
+                            page === 'menuList' ? true : false ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                            'block rounded-md px-3 py-2 text-base font-medium'
+                        )}
+                        aria-current={page === 'menuList' ? true : false ? 'page' : undefined}
+                        >
+                        {'Перейти в меню'}
+                    </Link>
                     </div>
                 </Disclosure.Panel>
                 </>

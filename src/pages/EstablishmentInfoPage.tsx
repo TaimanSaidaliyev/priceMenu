@@ -9,7 +9,7 @@ export default function EstablishmentInfoPage() {
     let { establishment_id } = useParams();
     const [establishment, setEstablishment] = useState<IEstablishment>();
 
-    const [getEstablishmentInfomation, isProductInfomationLoading, isProductInfomationError] = useFetching(async () => {
+    const [getEstablishmentInfomation] = useFetching(async () => {
         const response = await Establishment.getEstablishmentInformationById(establishment_id || '0');
         setEstablishment(response.data.establishment);
     });
