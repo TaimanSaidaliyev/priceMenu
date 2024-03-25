@@ -77,7 +77,7 @@ export default function Header({page}:{page: string}) {
                         <div className="flex flex-shrink-0 items-center">
                         <img
                             className="h-8 w-auto"
-                            src="/public/img/logo_qr.png"
+                            src="/img/logo_qr.png"
                             alt="Your Company"
                         />
                         </div>

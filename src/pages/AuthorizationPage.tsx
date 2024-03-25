@@ -80,7 +80,7 @@ export default function AuthorizationPage() {
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img
                     className="mx-auto h-20 w-auto"
-                    src="/public/img/logo_qr.png"
+                    src="/img/logo_qr.png"
                     alt="Your Company"
                 />
                 <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
