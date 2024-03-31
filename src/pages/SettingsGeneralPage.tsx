@@ -74,7 +74,7 @@ export default function SettingsGeneralPage() {
         formData.append('default_color', establishment.default_color);
         formData.append('description', establishment.description || '');
         formData.append('workTime', establishment.workTime || '');
-        formData.append('menu_view_type', establishment.menu_view_type || 'List');
+        formData.append('menu_view_type', establishment.menu_view_type || '');
 
         if (isFile(establishment.photo)) {
             formData.append('photo', establishment.photo);
@@ -203,7 +203,7 @@ export default function SettingsGeneralPage() {
                                 </div>
                                 <div className="mt-3">
                                     <p className='font-semibold'>Режим отображения</p>
-                                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                    <select value={establishment.menu_view_type} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                                         onChange={(e)=>{setEstablishment((prevState: IEstablishment | undefined) => ({...prevState!, menu_view_type: e.target.value}))}}>
                                         <option value={'Square'}>Квадратные плиты</option>
                                         <option value={'List'}>Список</option>

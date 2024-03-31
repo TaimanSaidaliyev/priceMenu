@@ -15,6 +15,7 @@ import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { getCookie } from '../utils/cookie';
 import DialogModal from '../ui/DialogModal';
+import NotificationToast from '../ui/NotificationToast';
 
 
 export default function SettingsMenuPage() {
@@ -82,7 +83,7 @@ export default function SettingsMenuPage() {
            setSelectedProduct(res.data.id);
         })
         .catch((e)=>{
-            console.error(e);
+            NotificationToast(e.message, 'error');
         });;
     });
 
@@ -218,7 +219,7 @@ export default function SettingsMenuPage() {
                                 onChange={(e)=>{isChanged ?  SaveAlert() : setSelectedMenu(e.target.value)}}>
                                 <option value={'0'}>Выберите меню из списка</option>
                                 {
-                                    menuList.map((menuItem, index)=>
+                                    menuList.sort((a: any, b: any) => a.sorting_number - b.sorting_number).map((menuItem, index)=>
                                         <option value={menuItem.id} key={menuItem.id}>{menuItem.menu_title}</option>
                                     )
                                 }
@@ -827,6 +828,7 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, s
             getProduct();
         })
         .catch((e)=>{
+            NotificationToast(e.message + e.response.data.photo,'error');
             console.error(e);
         });;
     });

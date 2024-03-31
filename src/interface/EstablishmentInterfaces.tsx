@@ -39,6 +39,7 @@
       sorting_number: number;
     } [];
     establishment: string;
+    sorting_number: number;
   };
   
   interface IMenu {
@@ -69,5 +70,6 @@
     address?: string,
     workTime?: string,
     phoneNumber?: string,
-    menu_view_type?: string
+    menu_view_type?: string,
+    until_date?: string,
   }
