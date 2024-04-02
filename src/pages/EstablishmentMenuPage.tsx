@@ -66,7 +66,7 @@ function EstablishmentMenuPage() {
   const [untilDate, setUntilDate] = useState<Date>();
 
   
-  const [getEstablishmentInfomation] = useFetching(async () => {
+  const [getEstablishmentInfomation, isGetEstablishmentInfomationLoading] = useFetching(async () => {
     const response = await Establishment.getEstablishmentInformationById(establishment_id || '0');
     setEstablishment(response.data.establishment);
     setUntilDate(new Date(response.data.establishment.until_date));
@@ -165,29 +165,37 @@ function EstablishmentMenuPage() {
   return (
     <>
       <div className='flex w-full justify-center'>
-        <div className='bg-white max-w-[900px] w-full border-gray-200 border'>
-          {
-            (untilDate || new Date('2024-01-01')) <= new Date() 
-            ?
-            <div className='text-center w-full p-5  items-center'>
-              <p>Меню не существует</p>
-              <p className='text-blue-500'>Вернуться на главную страницу</p>
-            </div>
-            :
-            <>
-              <PageHeader establishment={establishment} setShowInfoModal={setShowInfoModal} />
-              <BannersPromotions searchText={searchText} establishment={establishment} banners={banners} promotions={promotions} isLoading={isGetPromotionsListLoading}/>
-              <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
-              <SearchFiled searchText={searchText} setSearchText={setSearchText}/>
-              {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
-              <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} isGetProductListLoading={isGetProductListLoading} showProductModal={showProductModal} setShowProductModal={setShowProductModal} setProduct={setProduct}/>
-              <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
-              <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
-              <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
-              <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
-              <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount}/>
-            </>
-          }
+        <div className='bg-white max-w-[900px] w-full border-gray-200 border min-h-[300px]'>
+        {
+          isGetEstablishmentInfomationLoading || isGetProductListLoading || isGetPromotionsListLoading ?
+            <BounceLoader/>
+          :
+          <>
+            {
+              (untilDate || new Date('2024-01-01')) <= new Date() 
+              ?
+              <div className='text-center w-full p-5  items-center'>
+                <p>Меню не существует</p>
+                <p className='text-blue-500'>Вернуться на главную страницу</p>
+              </div>
+              :
+              <>
+                <PageHeader establishment={establishment} setShowInfoModal={setShowInfoModal} />
+                <BannersPromotions searchText={searchText} establishment={establishment} banners={banners} promotions={promotions} isLoading={isGetPromotionsListLoading}/>
+                <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
+                <SearchFiled searchText={searchText} setSearchText={setSearchText}/>
+                {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
+                <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} isGetProductListLoading={isGetProductListLoading} showProductModal={showProductModal} setShowProductModal={setShowProductModal} setProduct={setProduct}/>
+                <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
+                <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
+                <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
+                <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
+                <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount}/>
+              </>
+            }
+          </>
+        }
+          
             
         </div>
       </div>
@@ -211,12 +219,12 @@ const PageHeader = ({ establishment, setShowInfoModal }: { establishment?: IEsta
       </p>
       <p className='absolute top-0 right-0 text-lg text-white mt-3 me-5'>
         <div className='flex flex-row items-center'>
-          <span className='text-white me-6'>
+          {/* <span className='text-white me-6'>
             Оставить отзыв
           </span>
           <span className='text-white'>
             Книга жалоб
-          </span>
+          </span> */}
         </div>
       </p>
     </div>
@@ -421,7 +429,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
   
   if(establishment?.menu_view_type === "List"){
     return (
-      <div className='w-full p-5 pb-[100px]'>
+      <div className='w-full pb-[100px]'>
         {productList.filter(menu => menu.id === selectedMenu).map((menu)=>
           <div key={menu.id}>
             {
@@ -432,7 +440,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                   <div key={index} id={category.id.toString()}>
                     {
                         searchText.length === 0 &&
-                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1'>
+                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 z-1 p-5'>
                           <p className='text-2xl font-semibold my-3'>
                             {category.category_title}
                           </p>
@@ -444,7 +452,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                       .sort((a, b) => a.sorting_number - b.sorting_number)
                       .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                       .map((product, indexProduct)=>
-                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} `} key={indexProduct}>
+                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} p-5`} key={indexProduct}>
                           <div className='relative' onClick={()=>{setProduct(product); setShowProductModal(true)}}>
                           {
                             product.photo &&
@@ -512,7 +520,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
   }
   else {
     return (
-      <div className='w-full p-5 pb-[100px]'>
+      <div className='w-full pb-[100px]'>
           {productList.filter(menu => menu.id === selectedMenu).map((menu)=>
             <div key={menu.id}>
               {
@@ -523,14 +531,14 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                     <div key={index} id={category.id.toString()}>
                       {
                         searchText.length === 0 &&
-                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1'>
+                        <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 z-1 p-5'>
                           <p className='text-2xl font-semibold my-3'>
                             {category.category_title}
                           </p>
                           <FaChevronDown size={20} onClick={()=>{setShowCategoryModal(true)}}/>
                         </div>
                       }
-                      <div className='grid gap-4 grid-cols-2 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3'>
+                      <div className='grid gap-4 grid-cols-2 lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 p-5'>
                       {
                         category.products
                         .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
@@ -601,7 +609,7 @@ const BottomNavigationBar = ({totalCount, totalPrice, setShowModal, establishmen
     <>
     {
         totalCount > 0 &&
-        <div className={`transition duration-300 ease-in-out flex fixed bottom-0 z-49 w-full text-center max-w-[899px] px-10 py-5 justify-center ${totalCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`transition duration-300 ease-in-out flex fixed bottom-0 z-49 w-full text-center max-w-[899px] px-10 py-5 justify-center ${totalCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'} z-15`}>
           <button className={`px-4 py-3 rounded-3xl font-semibold me-2 whitespace-nowrap ${isLight ? 'text-gray-800' : 'text-white'}`} style={{backgroundColor: establishment?.default_color}}>
             <div className='flex flex-row items-center' onClick={() => setShowModal(true)}><FaCartShopping className='me-3'/> Оформить корзину {formatPrice(totalPrice)}</div>
           </button>
@@ -711,32 +719,38 @@ const ModalEstablishmentWindow = ({establishment, showModal, setShowModal} : {es
                     <img className='object-cover w-[150px] h-[150px] rounded-lg' src={BACK_HOST + establishment?.photo}/>
                     <div className='ms-3'>
                         <p className={`text-2xl font-semibold`} style={{color: establishment?.default_color}}>{establishment?.title}</p>
-                        <p className='text-lg flex items-center mt-2'>
+                        {
+                          establishment && establishment.phoneNumber && establishment.phoneNumber.length &&
+                          <p className='text-lg flex items-center mt-2'>
                             <FaPhone className='me-2' style={{color: establishment?.default_color}}/>
                             {establishment?.phoneNumber}
-                        </p>
-                        <p className='text-lg flex items-center mt-2'>
+                          </p>
+                        }
+                        {
+                          establishment && establishment.address && establishment.address.length &&
+                          <p className='text-lg flex items-center mt-2'>
                             <FaLocationArrow className='me-2' style={{color: establishment?.default_color}}/>
                             {establishment?.address}
-                        </p>
-                        <p className='text-lg flex items-center mt-2'>
+                          </p>
+                        }
+                        {
+                          establishment && establishment.workTime && establishment.workTime.length &&
+                          <p className='text-lg flex items-center mt-2'>
                             <FaClock className='me-2' style={{color: establishment?.default_color}}/>
                             {establishment?.workTime}
-                        </p>
+                          </p>
+                        }
+                        
                     </div>
                 </div>
-                <div className='flex flex-row py-2 px-5 '>
-                    <button className='w-1/2 flex-1 px-4 py-2 rounded-3xl text-white font-semibold me-2 whitespace-nowrap' style={{backgroundColor: "#E1306C"}}>
-                        <div className='flex flex-row items-center justify-center cursor-pointer'><FaInstagram size={24} className='me-3'/> aura_restaurant </div>
-                    </button>
-                    <button className='w-1/2 flex-1 px-4 py-2 rounded-3xl text-white font-semibold me-2 whitespace-nowrap' style={{backgroundColor: "#075E54"}}>
-                        <div className='flex flex-row items-center justify-center cursor-pointer'><FaWhatsapp size={24} className='me-3'/> Написать </div>
-                    </button>
-                </div>
-                <div className='w-full px-5 py-5' >
-                    <p className='text-lg font-semibold'>Описание</p>
-                    {establishment?.description}
-                </div>
+                {
+                  establishment && establishment.description && establishment.description.length > 0  &&
+                  <div className='w-full px-5 py-5' >
+                      <p className='text-lg font-semibold'>Описание</p>
+                      {establishment?.description}
+                  </div>
+                }
+                
                 <div className='flex justify-center pb-5'>
                     <button className={`px-4 py-2 rounded-3xl ${isLight ? 'text-gray-800' : 'text-white'} font-semibold me-2 whitespace-nowrap`} style={{backgroundColor: establishment?.default_color}} onClick={()=>{setShowModal(false)}}>
                         <div className='flex flex-row items-center cursor-pointer' >
@@ -787,7 +801,7 @@ const ModalCategoryList = ({productList, selectedMenu, selectedCategory, setSele
 const ModalProductInfo = ({productList, selectedMenu, selectedCategory, setSelectedCategory, establishment, showProductModal, setShowProductModal, product, incrementCount}:{productList: IMenuList[], selectedMenu: number, selectedCategory: number, setSelectedCategory: Function, establishment?: IEstablishment, showProductModal: boolean, setShowProductModal: Function, product: IProducts, incrementCount: Function}) => {
   return (
     <DialogModal isOpen={showProductModal} setIsOpen={setShowProductModal}>
-    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-2 py-2 border-b-2 border-gray-200'>
+    <div className='w-full flex flex-col overflow-y-scroll no-scrollbar px-2 py-2 border-b-2 border-gray-200 z-30'>
         <img src={product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} className={'object-cover max-h-[500px] rounded-md'}/>
         <p className='mt-3 text-xl font-semibold'>{product.title}</p>
 
