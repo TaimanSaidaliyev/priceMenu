@@ -42,7 +42,7 @@ export default function SettingsMenuPage() {
 
     let navigate = useNavigate();
 
-    const product: IProducts = ({id: '', description: 'Описание нового блюда', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory, sorting_number: 0, establishment: establishmentId});
+    const product: IProducts = ({id: '', description: '', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory, sorting_number: 0, establishment: establishmentId});
 
     const [checkToken] = useFetching(async () => {
         const response = await User.checkToken().then((res)=>{
