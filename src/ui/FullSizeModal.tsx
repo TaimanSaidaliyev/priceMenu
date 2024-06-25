@@ -7,7 +7,7 @@ export default function FullSizeModal({children, isOpen, setIsOpen}: {children?:
   
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={()=>{setIsOpen(false)}}>
+      <Dialog as="div" className="relative z-30" onClose={()=>{setIsOpen(false)}}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

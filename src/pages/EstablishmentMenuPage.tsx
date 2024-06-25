@@ -16,6 +16,7 @@ import { FaInstagram } from 'react-icons/fa';
 import DialogModal from '../ui/DialogModal';
 import { ClockIcon, PhoneIcon, HomeIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { getTextColorForBackground } from '../utils/getTextColor';
+import { Footer } from '../components/homepage/FotterMainPage';
 
 
 const isLight: boolean = false;
@@ -193,6 +194,7 @@ function EstablishmentMenuPage() {
                 <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
                 <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
                 <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount}/>
+                <Footer/>
               </>
             }
           </>
@@ -353,12 +355,12 @@ const MenuBlock = ({ establishment, productList, selectedMenu, setSelectedMenu, 
                     menu.id === selectedMenu ?
                     <div className='w-[130px] p-3 rounded-xl text-center me-3 h-[170px] cursor-pointer' style={{backgroundColor: establishment?.default_color}} key={index} >
                       <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={BACK_HOST + menu.photo} />
-                      <p className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'} mt-1 text-sm`}>{menu.menu_title}</p>
+                      <p className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'} mt-1 text-sm line-clamp-2`}>{menu.menu_title}</p>
                     </div>
                     :
                     <div className='w-[130px] p-3 bg-gray-100 rounded-xl text-center me-3 h-[170px] cursor-pointer' key={index}>
                       <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={BACK_HOST + menu.photo}/>
-                      <p className='text-sm mt-1'>{menu.menu_title}</p>
+                      <p className='text-sm mt-1 line-clamp-2'>{menu.menu_title}</p>
                     </div>
                   }
                 </div>
@@ -652,7 +654,7 @@ const BottomNavigationBar = ({totalCount, totalPrice, setShowModal, establishmen
     <>
     {
         totalCount > 0 &&
-        <div className={`transition duration-300 ease-in-out flex fixed bottom-0 z-49 w-full text-center max-w-[899px] px-10 py-5 justify-center ${totalCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'} z-20`}>
+        <div className={`transition duration-300 ease-in-out flex fixed bottom-0 w-full text-center max-w-[899px] px-10 py-5 justify-center ${totalCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'} z-20`}>
           <button className={`px-4 py-3 rounded-3xl font-semibold me-2 whitespace-nowrap ${isLight ? 'text-gray-800' : 'text-white'}`} style={{backgroundColor: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#777777' : establishment?.default_color}}>
             <div className='flex flex-row items-center' onClick={() => setShowModal(true)}><FaCartShopping className='me-3'/> Оформить корзину {formatPrice(totalPrice)}</div>
           </button>
