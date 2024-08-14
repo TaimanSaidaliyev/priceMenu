@@ -1,3 +1,5 @@
+import { borderBottomWidth } from "html2canvas/dist/types/css/property-descriptors/border-width";
+
 interface PaddingThemeDivider {
     pt?: number,
     pb?: number,
@@ -11,7 +13,7 @@ export default function ThemeDivider(padding: PaddingThemeDivider) {
     return (
         <>
         <div className={`pt-${pt} pb-${pb} ps-${ps} pe-${pe}`}>
-            <div className="border-b-2 border-gray-150"></div>
+            <div className="border-gray-150" style={{borderBottomWidth: 1}}></div>
         </div>
         </>
     )

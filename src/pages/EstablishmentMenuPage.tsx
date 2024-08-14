@@ -6,7 +6,7 @@ import QRCode from 'react-qr-code';
 import formatPrice from './../utils/formatPrice';
 import { useFetching } from './..//hooks/useFetching';
 import { Establishment } from './..//api/api';
-import { BACK_HOST, WEBSITE_NAME } from './..//configs/config';
+import { BACK_HOST, BASE_TEXT, HEADER_TEXT, WEBSITE_NAME } from './..//configs/config';
 import { format } from 'date-fns';
 import BounceLoader from "react-spinners/BounceLoader";
 import { useParams } from 'react-router-dom';
@@ -227,7 +227,7 @@ const PageHeader = ({ establishment, setShowInfoModal }: { establishment?: IEsta
         <p className='text-2xl font-semibold mt-2'>
           {establishment?.title}
         </p>
-        <p className='text-md text-gray-400 mt-2'>
+        <p className='text-sm text-gray-400 mt-2 px-5'>
           {establishment?.description}
         </p>
         <p className='text-md text-gray-600 mt-2 px-5 font-semibold '>
@@ -301,13 +301,13 @@ const BannersPromotions = ({searchText, establishment, banners, promotions, isLo
                   promotions.filter(promotion => promotion.promotion_type === 'Label' ).map((promotion, index) =>
                   <div className='w-full' key={index}>
                     <div> 
-                      <p className={`text-xl font-semibold`} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}}>{promotion.title}</p>
-                      <span className='text-gray-500'>
+                      <p className={`${HEADER_TEXT} font-semibold`} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}}>{promotion.title}</p>
+                      <span className={`${BASE_TEXT} text-gray-500`}>
                         {promotion.description}
                       </span>
                     </div>
-                    <div className='w-full flex justify-end'>
-                      <span className='text-${firstColor}'>
+                    <div className='w-full flex justify-end mt-1'>
+                      <span className={BASE_TEXT}>
                         до {format(promotion.until_date, 'dd.MM.yyyy')}
                       </span>
                     </div>
@@ -353,14 +353,14 @@ const MenuBlock = ({ establishment, productList, selectedMenu, setSelectedMenu, 
                 <div key={index} onClick={()=>{setSelectedMenu(menu.id)}}>
                   {
                     menu.id === selectedMenu ?
-                    <div className='w-[130px] p-3 rounded-xl text-center me-3 h-[170px] cursor-pointer' style={{backgroundColor: establishment?.default_color}} key={index} >
-                      <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={BACK_HOST + menu.photo} />
-                      <p className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'} mt-1 text-sm line-clamp-2`}>{menu.menu_title}</p>
+                    <div className='w-[130px] p-1 rounded-xl text-center me-3 h-[160px] cursor-pointer' style={{backgroundColor: establishment?.default_color}} key={index} >
+                      <img className='object-cover w-[120px] h-[100px] mx-auto' src={BACK_HOST + menu.photo} />
+                      <p className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'} mt-1 ${BASE_TEXT} line-clamp-2`}>{menu.menu_title}</p>
                     </div>
                     :
-                    <div className='w-[130px] p-3 bg-gray-100 rounded-xl text-center me-3 h-[170px] cursor-pointer' key={index}>
-                      <img className='object-cover w-[100px] h-[100px] rounded-full mx-auto' src={BACK_HOST + menu.photo}/>
-                      <p className='text-sm mt-1 line-clamp-2'>{menu.menu_title}</p>
+                    <div className='w-[130px] p-1 bg-gray-100 rounded-xl text-center me-3 h-[160px] cursor-pointer' key={index}>
+                      <img className='object-cover w-[120px] h-[100px] rounded-lg mx-auto' src={BACK_HOST + menu.photo}/>
+                      <p className= {`${BASE_TEXT} mt-1 line-clamp-2`}>{menu.menu_title}</p>
                     </div>
                   }
                 </div>
@@ -470,7 +470,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                     {
                         searchText.length === 0 &&
                         <div className='sticky top-0 flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 z-1 p-5 z-10'>
-                          <p className='text-2xl font-semibold my-3'>
+                          <p className='text-xl font-semibold my-3'>
                             {category.category_title}
                           </p>
                           <FaChevronDown size={20} onClick={()=>{setShowCategoryModal(true)}}/>
@@ -481,59 +481,74 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                       .sort((a, b) => a.sorting_number - b.sorting_number)
                       .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                       .map((product, indexProduct)=>
-                        <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} p-5 z-1`} key={indexProduct}>
-                          <div className='relative' onClick={()=>{setProduct(product); setShowProductModal(true)}}>
-                          {
-                            product.photo &&
-                            <>
-                              <div className='me-3 w-[110px]'>
-                                <img className='object-cover rounded-lg w-[110px] h-[110px]' src={`${BACK_HOST + product.photo}`}/>
-                              </div>
-                              {
-                                product.old_price > 0 &&
-                                <div className='rounded-md px-2 py-1 flex justify-center items-center absolute' style={{top: -2, right: 15, backgroundColor: establishment.default_color}}>
-                                  <span className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'}`}>
-                                    -{Math.round(((product.old_price - product.price)/product.old_price)*100)}%
-                                  </span>
-                                </div>
-                              }
-                            </>
-                          }
-                          </div>
-                          
-                          <div className='w-full flex flex-col justify-between'>
-                            <div>
-                              <p className='font-semibold text-lg line-clamp-3'>{product.title}</p>
-                              {
-                                !product.is_active &&
-                                <p className='font-semibold text-md  mt-1'>Временно отсутствует</p>
-                              }
-                              <p className='text-gray-500 mt-1 line-clamp-3 text-sm'>{product.description}</p>
-                            </div>
-                            <div className='flex flex-row justify-between items-end'>
-                              <div className='flex flex-row items-end'>
-                                <span className='text-lg font-semibold' style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}}>{formatPrice(product.price)}</span>
+                        <div className='px-5'>
+                          <div className={`flex w-full py-3 ${!product.is_active && 'opacity-35'} pb-5 z-1`} key={indexProduct}>
+                            <div className='w-full flex flex-col justify-between'>
+                              <div>
+                                <p className={`font-semibold ${HEADER_TEXT} line-clamp-3`}>{product.title}</p>
                                 {
-                                  product.old_price > 0 &&
-                                  <span className='text-base text-gray-400 line-through ms-2'>{formatPrice(product.old_price)}</span>
+                                  !product.is_active &&
+                                  <p className='font-semibold text-base mt-1'>Временно отсутствует</p>
                                 }
-                              </div>
-                              {
-                                product.is_active &&
-                                <div className='flex flex-row items-center'>
+                                <div className='flex flex-row items-end mt-2'>
+                                  <span className='text-lg font-semibold' style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}}>{formatPrice(product.price)}</span>
                                   {
-                                    product.count !== undefined && product.count > 0 && 
-                                    <>
-                                      <FaCircleMinus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
-                                      <span className={`text-xl font-semibold px-1`}>{product.count}</span>
-                                    </>
+                                    product.old_price > 0 &&
+                                    <span className='text-base text-gray-400 line-through ms-2'>{formatPrice(product.old_price)}</span>
                                   }
-                                  <FaCirclePlus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
                                 </div>
+                                <p className={`text-gray-500 mt-1 line-clamp-3 ${BASE_TEXT}`}>{product.description}</p>
+                              </div>
+                              <div className='flex flex-row justify-between items-end'>
+                                
+                              </div>
+                            </div>
+                            <div className='relative' >
+                              <div onClick={()=>{setProduct(product); setShowProductModal(true)}}>
+                              {
+                                product.photo &&
+                                <>
+                                  <div className='me-3 w-[110px]'>
+                                    <img className='object-cover rounded-xl w-[110px] h-[110px]' src={`${BACK_HOST + product.photo}`}/>
+                                  </div>
+                                  {
+                                    product.old_price > 0 &&
+                                    <div className='rounded-md px-2 py-1 flex justify-center items-center absolute' style={{top: -2, right: 15, backgroundColor: establishment.default_color}}>
+                                      <span className={`${getTextColorForBackground(establishment?.default_color ?? '#000000') ? 'text-gray-800' : 'text-white'}`}>
+                                        -{Math.round(((product.old_price - product.price)/product.old_price)*100)}%
+                                      </span>
+                                    </div>
+                                  }
+                                </>
                               }
+                              </div>
+                            
+                            {
+                              product.is_active &&
+                              <div className='flex flex-row items-center mt-1'>
+                                <div className='flex flex-row justify-center text-center w-full ms-[-6px]'>
+                                {
+                                  product.count !== undefined && product.count > 0 && 
+                                  <>
+                                    <FaCircleMinus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
+                                    <span className={`text-md font-semibold px-1`}>{product.count}</span>
+                                    <FaCirclePlus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
+                                  </>
+                                }
+                                {
+                                  !(product.count !== undefined && product.count) && 
+                                  <button className="text-white py-2 px-4 rounded-3xl w-[110px]" onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}} style={{backgroundColor: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#777777' : establishment?.default_color}}>
+                                    Добавить 
+                                  </button>
+                                }
+                                </div>
+                              </div>
+                            }
                             </div>
                           </div>
+                          <ThemeDivider/>
                         </div>
+                        
                       )
                     }
                   </div>
@@ -541,7 +556,9 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
               </div>
               )
             }
+            
           </div>
+          
         )}
       </div>
     );
@@ -587,7 +604,7 @@ const ProductList = ({productList, selectedMenu, searchText, establishment, incr
                                 }
                             </div>
                             
-                            <p className='line-clamp-2 text-center text-sm font-semibold'>
+                            <p className='line-clamp-2 text-center text-sm font-semibold mt-1'>
                               {product.title}
                             </p>
                             <p className='pb-1 line-clamp-2 text-center text-sm text-gray-500'>
