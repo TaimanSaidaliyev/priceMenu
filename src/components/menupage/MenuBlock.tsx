@@ -1,5 +1,4 @@
 import { BACK_HOST, BASE_TEXT } from "../../configs/config";
-import { getTextColorForBackground } from "../../utils/getTextColor";
 
 export const MenuBlock = ({ establishment, productList, selectedMenu, setSelectedMenu, isLoading }: { establishment?: IEstablishment, productList: IMenuList[], selectedMenu: number, setSelectedMenu: Function, isLoading: boolean }) => {
     return (
@@ -31,7 +30,7 @@ export const MenuBlock = ({ establishment, productList, selectedMenu, setSelecte
                       <div className='w-[130px] rounded-xl text-center me-3 h-[160px] cursor-pointer' key={index}>
                         <div className="relative flex items-end w-full bg-cover bg-center h-full justify-center rounded-lg" style={{backgroundImage: `url(${BACK_HOST + menu.photo})`}}>
                           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent rounded-lg"></div>
-                          <p className={`text-gray-700'} mb-2 mt-1 ${BASE_TEXT} line-clamp-2 relative z-10`}>
+                          <p className={`text-gray-700'} mb-2 mt-1 ${BASE_TEXT} line-clamp-2 relative z-10 font-semibold`}>
                             {menu.menu_title}
                           </p>
                         </div>
@@ -40,7 +39,7 @@ export const MenuBlock = ({ establishment, productList, selectedMenu, setSelecte
                       <div className='w-[130px] rounded-xl text-center me-3 h-[160px] cursor-pointer' key={index}>
                         <div className="relative flex items-end w-full bg-cover bg-center h-full justify-center rounded-lg" style={{backgroundImage: `url(${BACK_HOST + menu.photo})`}}>
                           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent rounded-lg"></div>
-                          <p className={`text-white mt-1 ${BASE_TEXT} line-clamp-2 relative z-10 mb-2 `}>
+                          <p className={`text-white mt-1 ${BASE_TEXT} line-clamp-2 relative z-10 mb-2`}>
                             {menu.menu_title}
                           </p>
                         </div>

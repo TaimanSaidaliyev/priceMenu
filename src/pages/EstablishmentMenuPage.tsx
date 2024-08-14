@@ -16,6 +16,7 @@ import { ModalWindow } from '../components/menupage/ModalWindow';
 import { ModalEstablishmentWindow } from '../components/menupage/ModalEstablishmentWindow';
 import { ModalCategoryList } from '../components/menupage/ModalCategoryList';
 import { ModalProductInfo } from '../components/menupage/ModalProductInfo';
+import { motion } from "framer-motion"
 
 
 export const isLight: boolean = false;
@@ -164,13 +165,26 @@ function EstablishmentMenuPage() {
     }, 0);
   }, 0);
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: (i: any) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.3,
+        duration: 0.5,
+      },
+    }),
+  };
   return (
     <>
       <div className='flex w-full justify-center'>
         <div className='bg-white max-w-[900px] w-full border-gray-200 border min-h-[300px]'>
           {
             isGetEstablishmentInfomationLoading || isGetProductListLoading || isGetPromotionsListLoading ?
+            <div className='w-full flex justify-center'>
               <BounceLoader/>
+            </div>
             :
             <>
               {
@@ -182,18 +196,51 @@ function EstablishmentMenuPage() {
                 </div>
                 :
                 <>
-                  <PageHeader establishment={establishment} setShowInfoModal={setShowInfoModal} />
-                  <BannersPromotions searchText={searchText} establishment={establishment} banners={banners} promotions={promotions} isLoading={isGetPromotionsListLoading}/>
-                  <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading}/>
-                  <SearchField searchText={searchText} setSearchText={setSearchText}/>
-                  {/* <ProductCategoriesButtons establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory}/> */}
-                  <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} isGetProductListLoading={isGetProductListLoading} showProductModal={showProductModal} setShowProductModal={setShowProductModal} setProduct={setProduct}/>
-                  <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice}/>
-                  <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment}/>
-                  <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment}/>
-                  <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal}/>
-                  <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount}/>
-                  <Footer/>
+                  <>
+                    <motion.div custom={0} initial="hidden" animate="visible" variants={containerVariants}>
+                      <PageHeader establishment={establishment} setShowInfoModal={setShowInfoModal} />
+                    </motion.div>
+
+                    <motion.div custom={1} initial="hidden" animate="visible" variants={containerVariants}>
+                      <BannersPromotions searchText={searchText} establishment={establishment} banners={banners} promotions={promotions} isLoading={isGetPromotionsListLoading} />
+                    </motion.div>
+
+                    <motion.div custom={2} initial="hidden" animate="visible" variants={containerVariants}>
+                      <MenuBlock productList={productList} selectedMenu={selectedMenu} setSelectedMenu={setSelectedMenu} establishment={establishment} isLoading={isGetProductListLoading} />
+                    </motion.div>
+
+                    <motion.div custom={3} initial="hidden" animate="visible" variants={containerVariants}>
+                      <SearchField searchText={searchText} setSearchText={setSearchText} />
+                    </motion.div>
+
+                    <motion.div custom={4} initial="hidden" animate="visible" variants={containerVariants}>
+                      <ProductList establishment={establishment} incrementCount={incrementCount} productList={productList} searchText={searchText} selectedMenu={selectedMenu} setShowCategoryModal={setShowCategoryModal} isGetProductListLoading={isGetProductListLoading} showProductModal={showProductModal} setShowProductModal={setShowProductModal} setProduct={setProduct} />
+                    </motion.div>
+
+                    <motion.div custom={5} initial="hidden" animate="visible" variants={containerVariants}>
+                      <BottomNavigationBar establishment={establishment} setShowModal={setShowModal} totalCount={totalCount} totalPrice={totalPrice} />
+                    </motion.div>
+
+                    <motion.div custom={6} initial="hidden" animate="visible" variants={containerVariants}>
+                      <ModalWindow cartProducts={cartProducts} incrementCount={incrementCount} setShowModal={setShowModal} showModal={showModal} total={total} establishment={establishment} />
+                    </motion.div>
+
+                    <motion.div custom={7} initial="hidden" animate="visible" variants={containerVariants}>
+                      <ModalEstablishmentWindow setShowModal={setShowInfoModal} showModal={showInfoModal} establishment={establishment} />
+                    </motion.div>
+
+                    <motion.div custom={8} initial="hidden" animate="visible" variants={containerVariants}>
+                      <ModalCategoryList establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowCategoryModal={setShowCategoryModal} showCategoryModal={showCategoryModal} />
+                    </motion.div>
+
+                    <motion.div custom={9} initial="hidden" animate="visible" variants={containerVariants}>
+                      <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount} />
+                    </motion.div>
+
+                    <motion.div custom={10} initial="hidden" animate="visible" variants={containerVariants}>
+                      <Footer />
+                    </motion.div>
+                  </>
                 </>
               }
             </>
