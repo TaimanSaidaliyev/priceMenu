@@ -12,7 +12,6 @@ import SettingsGeneralPage from './pages/SettingsGeneralPage';
 import ListForWaiterPage from './pages/ListForWaiterPage';
 import AuthorizationPage from './pages/AuthorizationPage';
 
-
 const router = createBrowserRouter([
   {
     path: "establishment/:establishment_id",
@@ -46,7 +45,6 @@ const router = createBrowserRouter([
     path: 'login/',
     element: <AuthorizationPage/> 
   },
-
 ]);
 
 function App() {

@@ -17,6 +17,7 @@ import { ModalEstablishmentWindow } from '../components/menupage/ModalEstablishm
 import { ModalCategoryList } from '../components/menupage/ModalCategoryList';
 import { ModalProductInfo } from '../components/menupage/ModalProductInfo';
 import { motion } from "framer-motion"
+import { containerVariants } from '../utils/animations';
 
 
 export const isLight: boolean = false;
@@ -165,17 +166,7 @@ function EstablishmentMenuPage() {
     }, 0);
   }, 0);
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: (i: any) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.3,
-        duration: 0.5,
-      },
-    }),
-  };
+
   return (
     <>
       <div className='flex w-full justify-center'>
