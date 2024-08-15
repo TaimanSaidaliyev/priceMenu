@@ -11,8 +11,12 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
     const navRef = useRef<HTMLDivElement>(null);
     const [activeCategory, setActiveCategory] = useState<string>('');
     const [loaded, setLoaded] = useState<boolean>(false);
+    
+    let categories = productList.filter(menu => menu.id === selectedMenu).flatMap(menu => menu.categories.map(category => category.category_title));
 
-    const categories = productList.filter(menu => menu.id === selectedMenu).flatMap(menu => menu.categories.map(category => category.category_title));
+    useEffect(()=>{
+      categories = productList.filter(menu => menu.id === selectedMenu).flatMap(menu => menu.categories.map(category => category.category_title));
+    },[categories]);
 
     useEffect(() => {
       if (activeCategory && navRef.current) {
@@ -26,7 +30,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
         }
       }
       
-    }, [activeCategory]);
+    }, [activeCategory, productList, selectedMenu, categories]);
 
     const handleCategoryClick = (event: React.MouseEvent<HTMLAnchorElement>, category: string) => {
       event.preventDefault();
@@ -51,6 +55,12 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
       
     }, [categories]);
 
+    const scollProducts = (el: HTMLElement | undefined) => {
+      if(el){
+        setActiveCategory(el ? el.getAttribute('id') || '' : '')  
+      };
+    }
+
     if(establishment?.menu_view_type === "List"){
       
       return (
@@ -60,14 +70,14 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
             className="flex space-x-4 overflow-x-auto whitespace-nowrap bg-white sticky top-0 z-10 px-5 pt-5 w-full no-scrollbar backdrop-blur-lg bg-opacity-70"
           >
             {
-              establishment &&
+                establishment && categories && 
                 <Scrollspy
-                items={categories}
-                currentClassName={`font-bold border-b-2 pb-4 border-[${getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}]`}
-                className="flex space-x-4"
-                onUpdate={(el: HTMLElement | undefined) => setActiveCategory(el ? el.getAttribute('id') || '' : '')}
-                offset={-60}
-              >
+                  items={categories}
+                  currentClassName={`font-bold border-b-2 pb-4 border-[${getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}]`}
+                  className="flex space-x-4"
+                  onUpdate={(el: HTMLElement | undefined) => scollProducts(el)}
+                  offset={-60}
+                >
                 {categories.map(category => 
                   {                
                     return (
@@ -129,6 +139,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
       );
     }
     else {
+
       return (
         <div className='w-full pb-[100px]'>
             {productList.filter(menu => menu.id === selectedMenu).map((menu)=>
@@ -227,6 +238,8 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
             )}
         </div>
       );
+
+      
     }
     
   };
