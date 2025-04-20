@@ -18,6 +18,8 @@ import { ModalCategoryList } from '../components/menupage/ModalCategoryList';
 import { ModalProductInfo } from '../components/menupage/ModalProductInfo';
 import { motion } from "framer-motion"
 import { containerVariants } from '../utils/animations';
+import ProductListRecomended from '../components/menupage/ProductListRecomended';
+import ScrollToTopButton from '../components/menupage/ScrollToTop';
 
 
 export const isLight: boolean = false;
@@ -54,7 +56,9 @@ function EstablishmentMenuPage() {
     count: 0,
     establishment: '',
     sorting_number: 0,
-    additional_code: ''
+    additional_code: '',
+    is_recommended: false,
+    tags: []
   });
   const [selectedCategory, setSelectedCategory] = useState<number>(productList[0].id || 0);
   const [cartProducts, setCartProducts] = useState<IMenuList[]>([]);
@@ -68,7 +72,6 @@ function EstablishmentMenuPage() {
   const [banners, setBanners] = useState<IBanners[]>([]);
   const [promotions, setPromotions] = useState<IPromotions[]>([]);
   const [untilDate, setUntilDate] = useState<Date>();
-
   
   const [getEstablishmentInfomation, isGetEstablishmentInfomationLoading] = useFetching(async () => {
     const response = await Establishment.getEstablishmentInformationById(establishment_id || '0');
@@ -80,6 +83,7 @@ function EstablishmentMenuPage() {
     const response = await Establishment.getEstablishmentProductList(establishment_id || '0');
     setProductList(response.data.list);
     setSelectedMenu(response.data.list.sort((a: any, b: any) => a.sorting_number - b.sorting_number)[0].id);
+    // getOnlyProductList(response.data.list);
   });
 
   const [getPromotionsList, isGetPromotionsListLoading] = useFetching(async () => {
@@ -106,6 +110,7 @@ function EstablishmentMenuPage() {
     setCartProducts(filteredProductList);
     setTotal({totalPrice: totalPrice, totalCount: totalCount});
   },[productList]);
+
 
   useEffect(() => {
     document.title = WEBSITE_NAME + 'Меню заведения ' + establishment?.title;
@@ -149,6 +154,7 @@ function EstablishmentMenuPage() {
       });
     });
   };
+
 
   const totalPrice = productList.reduce((total, menu) => {
     return total + menu.categories.reduce((categoryTotal, category) => {
@@ -225,12 +231,23 @@ function EstablishmentMenuPage() {
                     </motion.div>
 
                     <motion.div custom={9} initial="hidden" animate="visible" variants={containerVariants}>
-                      <ModalProductInfo establishment={establishment} productList={productList} selectedCategory={selectedCategory} selectedMenu={selectedMenu} setSelectedCategory={setSelectedCategory} setShowProductModal={setShowProductModal} showProductModal={showProductModal} product={product} incrementCount={incrementCount} />
+                      <ModalProductInfo 
+                        establishment={establishment} 
+                        productList={productList} 
+                        selectedCategory={selectedCategory} 
+                        selectedMenu={selectedMenu} 
+                        setSelectedCategory={setSelectedCategory} 
+                        setShowProductModal={setShowProductModal} 
+                        showProductModal={showProductModal} 
+                        product={product} 
+                        incrementCount={incrementCount} 
+                      />
                     </motion.div>
 
                     <motion.div custom={10} initial="hidden" animate="visible" variants={containerVariants}>
                       <Footer />
                     </motion.div>
+                    <ScrollToTopButton establishment={establishment}/>
                   </>
                 </>
               }

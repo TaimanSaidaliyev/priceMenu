@@ -1,7 +1,10 @@
   interface IBanners {
-    id: number;
-    photo: string;
-    promotion_type: string;
+    id: Number;
+    title: string;
+    description?: string;
+    promotion_type?: string;
+    until_date: Date;
+    photo?: string;
   };
   
   interface IPromotions {
@@ -10,11 +13,26 @@
     description?: string;
     promotion_type?: string;
     until_date: Date;
+    photo?: string;
   };
   
+  interface ITags {
+    id: number;
+    title: string;
+    color: string;
+    icon: string;
+  }
+
+  interface IChildProduct {
+    id: number;
+    title: string;
+    price: number;
+  }
+
   interface IProducts {
     id: string;
     title: string;
+    parent?: string;
     category: string;
     description: string;
     price: number;
@@ -26,6 +44,9 @@
     establishment?: string;
     sorting_number: number;
     additional_code?: string;
+    is_recommended: boolean;
+    tags: ITags[];
+    child_products?: IChildProduct[];
   }
   
   interface IMenuList {
@@ -72,4 +93,5 @@
     phoneNumber?: string,
     menu_view_type?: string,
     until_date?: string,
+    tags_type_view: string
   }

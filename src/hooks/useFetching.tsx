@@ -9,7 +9,7 @@ export const useFetching = (callback: FetchingCallback): [FetchingCallback, bool
     const fetching: FetchingCallback = async () => {
         try {
             setIsLoading(true);
-            await callback(); // Теперь callback передается в качестве параметра функции useFetching
+            await callback();
         } catch (e: any) {
             setError(e.message);
         } finally {

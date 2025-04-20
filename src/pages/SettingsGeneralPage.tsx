@@ -4,13 +4,16 @@ import { useFetching } from "../hooks/useFetching";
 import { Establishment, User } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState, Fragment  } from "react";
-import QRCode from "react-qr-code";
-import { BACK_HOST, WEBSITE_NAME } from "../configs/config";
-import { ThemeInputText, ThemeTextarea } from "../ui/ThemeForms";
+// import QRCode from "react-qr-code";
+import { QRCode } from 'react-qrcode-logo';
+
+import { BACK_HOST, LOGO, WEBSITE_NAME } from "../configs/config";
+import { ThemeInputText, ThemeSwitcher, ThemeTextarea } from "../ui/ThemeForms";
 import { HexColorPicker } from "react-colorful";
 import { Menu, Transition } from '@headlessui/react'
 import { isFile } from "../utils/ifFile";
 import { MoonLoader } from "react-spinners";
+import { FaDownload } from "react-icons/fa6";
 
 
 export default function SettingsGeneralPage() {
@@ -19,7 +22,7 @@ export default function SettingsGeneralPage() {
     const formData = new FormData();
 
     const [establishmentId, setEstablishementId] = useState<string>('0');
-    const [establishment, setEstablishment] = useState<IEstablishment>({id: '0', default_color: '', title:'', address: '', backgroundImage: null, description: '', menu_view_type: '', phoneNumber: '', photo: null, secondary_color: false, workTime: ''});
+    const [establishment, setEstablishment] = useState<IEstablishment>({id: '0', default_color: '', title:'', address: '', backgroundImage: null, description: '', menu_view_type: '', phoneNumber: '', photo: null, secondary_color: false, workTime: '', tags_type_view: ''});
 
     const [getEstablishmentIdByToken] = useFetching(async () => {
         const response = await User.getEstablishmentIdByToken()
@@ -66,7 +69,6 @@ export default function SettingsGeneralPage() {
         }
     },[establishmentId])
 
-
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         formData.append('id', establishment.id);
@@ -75,6 +77,8 @@ export default function SettingsGeneralPage() {
         formData.append('description', establishment.description || '');
         formData.append('workTime', establishment.workTime || '');
         formData.append('menu_view_type', establishment.menu_view_type || '');
+        //@ts-ignore
+        formData.append('tags_type_view', establishment?.tags_type_view);
 
         if (isFile(establishment.photo)) {
             formData.append('photo', establishment.photo);
@@ -101,6 +105,22 @@ export default function SettingsGeneralPage() {
         theme: "light",
     });
 
+    const downloadJPG = (e: Event) => {
+        e.preventDefault();
+        const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement;
+        if (!canvas) return;
+    
+        const jpgUrl = canvas.toDataURL('image/jpeg', 1.0);
+    
+        const link = document.createElement('a');
+        link.href = jpgUrl;
+        link.download = 'qr-code.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+    
+    
     return (
         <div className='flex w-full justify-center'>
             <ToastContainer/>
@@ -207,20 +227,51 @@ export default function SettingsGeneralPage() {
                                         onChange={(e)=>{setEstablishment((prevState: IEstablishment | undefined) => ({...prevState!, menu_view_type: e.target.value}))}}>
                                         <option value={'Square'}>Квадратные плиты</option>
                                         <option value={'List'}>Список</option>
+                                        <option value={'NoImage'}>Без картинок</option>
+                                    </select>
+                                </div>
+                                <div className="mt-3">
+                                    <p className='font-semibold'>Вид тегов</p>
+                                    <select value={establishment.tags_type_view} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                        onChange={(e)=>{setEstablishment((prevState: IEstablishment | undefined) => ({...prevState!, tags_type_view: e.target.value}))}}>
+                                        <option value={'FIRST'}>Стандартный</option>
+                                        <option value={'SECOND'}>Упрощенный</option>
+                                        <option value={'THIRD'}>Одним стилем</option>
                                     </select>
                                 </div>
 
                             </div>
-                            <div className="flex-grow ms-5">
-                                <p>QR для распечатки</p>
-                                <p>
-                                    <QRCode
-                                        size={128}
-                                        style={{ height: "auto", maxWidth: "200px", width: "200px", maxHeight: "200px" }}
-                                        fgColor='#3b3b3b'
-                                        value={urlQr}
-                                        viewBox={`0 0 256 256`}
-                                    />
+                            <div className="flex-grow ">
+                                <p className="text-center pt-5 ">QR для распечатки</p>
+                                <p className="flex justify-center">
+                                    <div className="relative">
+                                        <QRCode
+                                            id="qr-canvas"
+                                            //@ts-ignore
+                                            className="mx-auto"
+                                            size={128}
+                                            style={{ 
+                                                height: "auto",
+                                                width: "100%",
+                                                maxWidth: "300px",
+                                            }}
+                                            fgColor="#000000"
+                                            logoWidth={40}
+                                            logoHeight={40}
+                                            logoImage={`${LOGO}`}
+                                            eyeColor={establishment.default_color}
+                                            eyeRadius={5}
+                                            logoPaddingStyle="circle"
+                                            qrStyle="squares"
+                                            value={urlQr}
+                                        />
+                                        <div className="absolute bg-blue-500 rounded-lg right-4 top-4 p-3 justify-center cursor-pointer" onClick={(e)=>downloadJPG(
+                                            //@ts-ignore
+                                            e
+                                        )}>
+                                            <FaDownload color="white" size={20}/>
+                                        </div>
+                                    </div>
                                 </p>
                             </div>
                             
@@ -230,7 +281,6 @@ export default function SettingsGeneralPage() {
                                 type="submit"
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-blue-700 sm:mt-0 sm:w-auto"
                             >
-
                                 {
                                     isSetEstablishmentInfomationLoading ?
                                     <>
@@ -244,14 +294,10 @@ export default function SettingsGeneralPage() {
                         </div>
                     </form>
                     :
-                    
                     <div className="h-[400px] flex items-center justify-center">
                         <MoonLoader/>
                     </div>
                 }
-                
-
-                
             </div>
         </div>
     )

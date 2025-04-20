@@ -2,9 +2,9 @@ import { useEffect, useState, Fragment, useRef } from 'react';
 import { useFetching } from '../hooks/useFetching';
 import { Dictionary, Establishment, SetDict, User } from '../api/api';
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { FaGripVertical, FaPlus, FaStop, FaTrash } from 'react-icons/fa6';
+import { FaCirclePlus, FaGripVertical, FaPlus, FaStop, FaTrash } from 'react-icons/fa6';
 import {ThemeInputNumber, ThemeInputText, ThemeSwitcher, ThemeTextarea} from '../ui/ThemeForms';
-import { BACK_HOST, WEBSITE_NAME } from '../configs/config';
+import { BACK_HOST, BASE_TEXT, WEBSITE_NAME } from '../configs/config';
 import { FaPen } from 'react-icons/fa6';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,6 +16,11 @@ import { useNavigate } from 'react-router-dom';
 import { getCookie } from '../utils/cookie';
 import DialogModal from '../ui/DialogModal';
 import NotificationToast from '../ui/NotificationToast';
+import {TagsInput} from '../ui/TagsInput';
+import AdditionalPrices from '../components/menupage/AdditionalPrices';
+import ThemeDivider from '../ui/ThemeDivider';
+import { ProductSettingsTagView } from '../components/menupage/ProductTags';
+import formatPrice from '../utils/formatPrice';
 
 
 export default function SettingsMenuPage() {
@@ -42,7 +47,7 @@ export default function SettingsMenuPage() {
 
     let navigate = useNavigate();
 
-    const product: IProducts = ({id: '', description: '', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory, sorting_number: 0, establishment: establishmentId});
+    const product: IProducts = ({id: '', description: '', is_active: true, is_published: true, old_price: 0, price: 0, title: 'Новое блюдо', category: selectedCategory, sorting_number: 0, establishment: establishmentId, is_recommended: false, tags: []});
 
     const [checkToken] = useFetching(async () => {
         const response = await User.checkToken().then((res)=>{
@@ -211,8 +216,9 @@ export default function SettingsMenuPage() {
             <ToastContainer/>
             <div className='bg-white max-w-[1366px] w-full border-gray-200 border'>
                 <Header page={'menu'}/>
+                
                 <div className='p-5'>
-                    <div className='flex flex-row w-full items-center gap-3'>
+                    {/* <div className='flex flex-row w-full items-center gap-3'>
                         <span>Выберите меню:</span>
                         <div className="inline-block relative w-64">
                             <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" 
@@ -238,6 +244,51 @@ export default function SettingsMenuPage() {
                                 <FaPen/>
                             </button>
                         }
+                    </div> */}
+
+                    <div className='flex flex-row w-full overflow-y-scroll no-scrollbar mt-2'>
+                    {
+                        menuList.sort((a, b) => a.sorting_number - b.sorting_number).map((menu, index)=>
+                            <div key={index} onClick={()=>{setSelectedMenu(menu.id.toString())}}>
+                            {
+                                menu.id.toString() === selectedMenu ?
+                                <div className='relative'>
+                                    <div className='rounded-md px-2 py-1 flex justify-center items-center absolute z-10' style={{top: 2, right: 4,}}>
+                                        <button className='p-1 bg-blue-500 rounded-md text-white me-1' onClick={()=>{setIsMenuEditModalOpen(true)}}>
+                                            <FaPen/>
+                                        </button>
+                                    </div>
+                                    <div className='w-[130px] rounded-xl text-center me-3 h-[160px] cursor-pointer' key={index}>
+                                        <div className="relative flex items-end w-full bg-cover bg-center h-full justify-center rounded-lg" style={{backgroundImage: `url(${BACK_HOST + menu.photo})`}}>
+                                            <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent rounded-lg"></div>
+                                            <p className={`text-gray-700'} mb-2 mt-1 ${BASE_TEXT} line-clamp-2 relative z-10 font-semibold`}>
+                                            {menu.menu_title}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                :
+                                <div className='w-[130px] rounded-xl text-center me-3 h-[160px] cursor-pointer' key={index}>
+                                    <div className="relative flex items-end w-full bg-cover bg-center h-full justify-center rounded-lg" style={{backgroundImage: `url(${BACK_HOST + menu.photo})`}}>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent rounded-lg"></div>
+                                        <p className={`text-white mt-1 ${BASE_TEXT} line-clamp-2 relative z-10 mb-2`}>
+                                        {menu.menu_title}
+                                        </p>
+                                    </div>
+                                </div>
+
+                            }
+                            
+                            </div>
+                        )
+                    }
+                    <div className='w-[130px] rounded-xl text-center me-3 h-[160px] cursor-pointer'>
+                        <div className="relative flex items-center w-full bg-cover bg-center h-full justify-center rounded-lg">
+                            <div className="absolute inset-0 to-transparent rounded-lg bg-gray-300"></div>
+                            <FaPlus className="cursor-pointer z-10 text-gray-500" size={48} onClick={()=>{setIsMenuAddModalOpen(true)}}/>
+                        </div>
+                    </div>
                     </div>
                     <div className='flex md:flex-row flex-col mt-5 gap-4'>
                         <div className='md:w-[250px] w-full h-auto overflow-auto'>
@@ -802,10 +853,13 @@ const CategoryEditModalContent = ({setIsCategoryEditModalOpen, selectedCategory,
 }
 
 const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, selectedProduct, getProductList, setIsDeleteWarningProductModalOpen, establishmentId}:{isChanged: boolean, setIsChanged: Function, notifyCancel: Function, notifyEdited: Function, selectedProduct: string, getProductList: Function, setIsDeleteWarningProductModalOpen: Function, establishmentId: string}) => {
-    const [product, setProduct] = useState<IProducts>({description: '', id: selectedProduct, is_active: true, is_published: false, old_price: 0, price: 0, title: '', category: '0', sorting_number: 0, establishment: establishmentId});
+    const [product, setProduct] = useState<IProducts>({description: '', id: selectedProduct, is_active: true, is_published: false, old_price: 0, price: 0, title: '', category: '0', sorting_number: 0, establishment: establishmentId, is_recommended: false, tags: []});
     const [img, setImg] = useState<string>('');
+    const [tagsDictionary, setTagsDctionary] = useState<ITags[]>([]);
+    const [subProductSelect, setSubProductSelect] = useState<number>(0);
+    
     const formData = new FormData();
-
+    
     const checkInProductData = () => {
         if(Number.isNaN(product.price)) {setProduct(prevProduct => ({...prevProduct, price: 0}))};
         if(Number.isNaN(product.old_price)) {setProduct(prevProduct => ({...prevProduct, old_price: 0}))};
@@ -817,6 +871,11 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, s
             setProduct(response.data.product);
             setImg(response.data.product.photo);
         }
+    });
+
+    const [getTagsList] = useFetching(async () => {
+        const response = await Dictionary.getTagsList();
+        setTagsDctionary(response.data);
     });
 
     const [editProduct, isEditProductLoading, isEditProductError] = useFetching(async () => {
@@ -833,6 +892,26 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, s
         });;
     });
 
+    const [deleteProduct, isDeleteProductLoading, isDeleteProductError] = useFetching(async () => {
+        const response = await SetDict.deleteProductById(subProductSelect.toString())
+        .then((res)=>{
+            productDeletedNotify();
+        })
+        .catch((e)=>{
+            NotificationToast(e.message + e.response.data.photo,'error');
+        })
+    });
+    
+
+    const removeTag = (tagId: number) => {
+        setProduct((prevProduct: IProducts) => ({
+          ...prevProduct,
+          tags: prevProduct.tags.filter(tag => tag.id !== tagId),
+        }));
+        setIsChanged(true);
+    };
+
+      
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         formData.append('id', product.id);
@@ -850,16 +929,44 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, s
         formData.append('is_published', product.is_published.toString());
         formData.append('is_active', product.is_active.toString());
         formData.append('category', product.category.toString());
+        product.tags.forEach(tag => {
+            formData.append('tags', tag.id.toString());
+        });
+          
+
         editProduct();
     };
+
+    useEffect(()=>{
+        getTagsList();
+    },[]);
 
     useEffect(()=>{
         getProduct();
     },[selectedProduct]);
     
     useEffect(()=>{
+        if (subProductSelect != 0) {
+            deleteProduct().then(()=>{
+                getProductList();
+                getProduct();
+            });
+            getProduct();
+        }
+    },[subProductSelect]);
+
+    useEffect(()=>{
         checkInProductData();
-    },[product])
+    },[product]);
+
+    const productDeletedNotify = () => toast.warning("Пункт удален", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+        theme: "light",
+    });
     
     return (
         <>
@@ -936,9 +1043,65 @@ const ProductCardEdit = ({isChanged, setIsChanged, notifyCancel, notifyEdited, s
                             <ThemeSwitcher checked={product.is_active} title={'Есть на кухне'} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{setProduct((prevProduct: IProducts) => ({...prevProduct, is_active: !prevProduct.is_active})); setIsChanged(true);}}/>
                             <ThemeSwitcher checked={product.is_published} title={'Опубликовано'} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>{setProduct((prevProduct: IProducts) => ({...prevProduct, is_published: !prevProduct.is_published})); setIsChanged(true);}}/>
                         </div>
+                        <div className='mt-3'>
+                            <p className='font-semibold'>Теги</p>
+                            <select
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                    const selectedTag = tagsDictionary.find(
+                                    (tag) => tag.id.toString() === e.target.value
+                                    );
+                                    if (selectedTag) {
+                                        setProduct((prevProduct: IProducts) => {
+                                        if (prevProduct.tags.some(tag => tag.id === selectedTag.id)) {
+                                            return prevProduct;
+                                        }
+
+                                        setIsChanged(true);
+                                        return { ...prevProduct, tags: [...prevProduct.tags, selectedTag] };
+                                        });
+                                    }
+                                }}
+                                className={'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'} 
+                            >
+                                <option></option>
+                            {
+                                tagsDictionary.map((tag)=>
+                                    <option value={tag.id.toString()} key={tag.id}>{tag.title}</option>
+                                )
+                            }
+                            </select>
+                            <div className="flex flex-row flex-wrap gap-1 mt-2">
+                            {
+                                product.tags.map((tag)=>
+                                    <ProductSettingsTagView tag={tag} removeTag={removeTag} key={tag.id}/>
+                                )
+                            }
+                            </div>
+                        </div>
+                        {/* <TagsInput availableTags={tagsDictionary} initialTags={product?.tags}/> */}
                     </div>
                 </div>
             </form>
+            <ThemeDivider pt={5} pb={5}/>
+            {/* <AdditionalPrices product={product} establishmentId={establishmentId} getProduct={getProduct}/> */}
+            {/* {
+                product?.child_products?.map((subProduct)=>
+                    <div className='flex flex-row justify-between gap-4 py-2'>
+                        <div>{subProduct.title}</div>
+                        <div>
+                            <div className='flex gap-1'>
+                                {formatPrice(subProduct.price)}
+                                <span className='text-red-600 cursor-pointer' onClick={()=>{setSubProductSelect(subProduct.id)}}>X</span>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+            {
+                product?.child_products?.length == 0 &&
+                <span>Других вариантов для цен у блюда нет</span>
+            } */}
+            
         </>
     );
 }

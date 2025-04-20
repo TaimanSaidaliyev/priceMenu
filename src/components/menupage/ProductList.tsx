@@ -4,6 +4,7 @@ import { getTextColorForBackground } from "../../utils/getTextColor";
 import formatPrice from "../../utils/formatPrice";
 import { isLight } from "../../pages/EstablishmentMenuPage";
 import ProductListItem from "./ProductListItem";
+import ProductListItemNoImage from "./ProductListItemNoImage";
 import { useEffect, useRef, useState } from "react";
 import Scrollspy from "react-scrollspy";
 
@@ -67,7 +68,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
         <>
           <div
             ref={navRef}
-            className="flex space-x-4 overflow-x-auto whitespace-nowrap bg-white sticky top-0 z-10 px-5 pt-5 w-full no-scrollbar backdrop-blur-lg bg-opacity-70"
+            className="flex space-x-4 overflow-x-auto whitespace-nowrap bg-white sticky top-0 px-5 pt-5 w-full no-scrollbar backdrop-blur-lg bg-opacity-70 z-10"
           >
             {
                 establishment && categories && 
@@ -103,7 +104,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
               <div id={category} key={category}>
                 {
                     searchText.length === 0 &&
-                    <div className='flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 z-1 p-5 z-10'>
+                    <div className='flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 p-5'>
                       <p className='text-xl font-semibold my-3'>
                         {category}
                       </p>
@@ -138,6 +139,80 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
         </>
       );
     }
+    else if (establishment?.menu_view_type == 'NoImage') {
+      return <>
+        <div
+          ref={navRef}
+          className="flex space-x-4 overflow-x-auto whitespace-nowrap bg-white sticky top-0 px-5 pt-5 w-full no-scrollbar backdrop-blur-lg bg-opacity-70 z-10"
+        >
+          {
+              establishment && categories && 
+              <Scrollspy
+                items={categories}
+                currentClassName={`font-bold border-b-2 pb-4 border-[${getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}]`}
+                className="flex space-x-4"
+                onUpdate={(el: HTMLElement | undefined) => scollProducts(el)}
+                offset={-60}
+              >
+              {categories.map(category => 
+                {                
+                  return (
+                    <a
+                      href={`#${category}`}
+                      key={category}
+                      className={`text-gray-700 cursor-pointer`}
+                      onClick={(e) => handleCategoryClick(e, category)}
+                    >
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </a>
+                  )
+                }
+            )}
+            </Scrollspy>
+          }
+          
+        </div>
+        <div className='w-full pb-[100px]'>
+        {productList.filter(menu => menu.id === selectedMenu).map((menu) => (
+        <div key={menu.id}>
+          {categories.map(category => (
+            <div id={category} key={category}>
+              {
+                  searchText.length === 0 &&
+                  <div className='flex flex-row justify-between backdrop-blur-md items-center bg-white/60 py-1 p-5'>
+                    <p className='text-xl font-semibold my-3'>
+                      {category}
+                    </p>
+                  </div>
+              }
+              {menu.categories
+                .filter(cat => cat.category_title === category) 
+                .flatMap(cat => cat.products
+                  .sort((a, b) => a.sorting_number - b.sorting_number)
+                  .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
+                  .map((product, indexProduct) => (
+                  <div key={product.id}>
+                    <ProductListItemNoImage 
+                      category={cat} 
+                      establishment={establishment} 
+                      incrementCount={incrementCount} 
+                      indexProduct={indexProduct} 
+                      menu={menu} 
+                      product={product} 
+                      setProduct={setProduct} 
+                      setShowProductModal={setShowProductModal} 
+                      showProductModal={showProductModal}
+                    />
+                  </div>
+                )))
+              }
+            </div>
+          ))}
+        </div>
+        ))}
+        </div>
+      </>;
+    }
     else {
 
       return (
@@ -167,7 +242,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
                           category.products
                           .filter(product => product.title.toLowerCase().includes(searchText.toLowerCase()))
                           .map((product, indexProduct)=>
-                            <div className={`text-center justify-center bg-gray-100 rounded-lg p-3 ${!product.is_active && 'opacity-35'} z-1`} key={indexProduct}>
+                            <div className={`text-center flex flex-col justify-between bg-gray-100 rounded-lg p-3 ${!product.is_active && 'opacity-35'} z-1`} key={indexProduct}>
                               <div className='relative'>
                                 <img className='object-cover rounded-lg h-[150px] w-full' src={`${product.photo ? BACK_HOST + product.photo : '/img/food_no_image.png'} `} onClick={()=>{setProduct(product); setShowProductModal(true)}}/>
                                   {
@@ -194,12 +269,16 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
                                 product.is_active && 
                                 <>
                                   {
+                                    product.old_price > 0 &&
+                                    <span className='text-sm line-through ms-3' style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#555555' : establishment?.default_color}}>{formatPrice(product.old_price)}</span>
+                                  }
+                                  {
                                     product.count !== undefined && product.count > 0 ?
                                     <>
                                       <div className='flex flex-row items-center justify-center'>
-                                        <FaCircleMinus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
+                                        <FaCircleMinus className="cursor-pointer" size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, false);}}/>
                                         <span className='text-xl font-semibold px-3'>{product.count}</span>
-                                        <FaCirclePlus size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
+                                        <FaCirclePlus className="cursor-pointer" size={24} style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}} onClick={()=>{incrementCount(menu.id, category.id, product.id, true);}}/>
                                       </div> 
                                       <div className='flex justify-center'>
                                         <span className='text-lg font-semibold' style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#000000' : establishment?.default_color}}>x {formatPrice(product.price*product.count)}</span>
@@ -216,10 +295,7 @@ export const ProductList = ({productList, selectedMenu, searchText, establishmen
                                           </div>
                                         </div>
                                       </button>
-                                      {
-                                        product.old_price > 0 &&
-                                        <span className='text-sm line-through ms-3' style={{color: getTextColorForBackground(establishment?.default_color ?? '#000000') ? '#555555' : establishment?.default_color}}>{formatPrice(product.old_price)}</span>
-                                      }
+                                      
                                     </>
                                   }
                                 </>

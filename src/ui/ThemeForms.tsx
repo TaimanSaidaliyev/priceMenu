@@ -1,10 +1,10 @@
 import React from 'react'
 
-export const ThemeInputText = ({onChange, value, className, required, disabled}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, className?: string, required?: boolean, disabled?: boolean}) => {
+export const ThemeInputText = ({onChange, value, className, required, disabled, placeholder}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, className?: string, required?: boolean, disabled?: boolean, placeholder?: string}) => {
   return (
     <input 
       type="text" 
-      placeholder='' 
+      placeholder={placeholder} 
       onChange={onChange} 
       value={value} 
       required={required || false}
@@ -13,6 +13,7 @@ export const ThemeInputText = ({onChange, value, className, required, disabled}:
     />
   )
 }
+
 
 export const ThemeTextarea = ({onChange, value, className, rows}:{onChange?: React.ChangeEventHandler<HTMLTextAreaElement>, value?: string, className?: string, rows?: number}) => {
   return (
@@ -26,13 +27,14 @@ export const ThemeTextarea = ({onChange, value, className, rows}:{onChange?: Rea
   )
 }
 
-export const ThemeInputNumber = ({onChange, value, required}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, required?: boolean}) => {
+export const ThemeInputNumber = ({onChange, value, required, className}:{onChange?: React.ChangeEventHandler<HTMLInputElement>, value?: string, required?: boolean, className?: string}) => {
   return (
     <input 
       placeholder='' 
       onChange={onChange} 
       value={value} 
-      type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+      type="text" 
+      className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 ${className}`}
       required={required || false}
     />
   )

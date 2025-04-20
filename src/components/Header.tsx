@@ -76,9 +76,8 @@ export default function Header({page}:{page: string}) {
                     <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                         <div className="flex flex-shrink-0 items-center">
                         <img
-                            className="h-8 w-auto"
-                            src="/img/logo_qr.png"
-                            alt="Your Company"
+                            className="h-8 w-auto shadow-white"
+                            src="/img/Logo_var_1_sqrt_white_bg.png"
                         />
                         </div>
                         <div className="hidden sm:ml-6 sm:block">

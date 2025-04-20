@@ -2,8 +2,13 @@ import { format } from "date-fns";
 import { BACK_HOST, BASE_TEXT, HEADER_TEXT } from "../../configs/config";
 import { getTextColorForBackground } from "../../utils/getTextColor";
 import ThemeDivider from "../../ui/ThemeDivider";
+import { useState } from "react";
+import { ModalPromotion } from "./ModalPromotion";
 
 export const BannersPromotions = ({searchText, establishment, banners, promotions, isLoading} : {searchText: string | ''; establishment?: IEstablishment; banners: IBanners[], promotions: IPromotions[], isLoading: boolean}) => {
+    const [selectedPromotion, setSelectedPromotion] = useState<IBanners>();
+    const [showPromotionModal, setShowPromotionModal] = useState<boolean>(false);
+
     return (
       <>
         {
@@ -35,7 +40,7 @@ export const BannersPromotions = ({searchText, establishment, banners, promotion
                       banners.filter(banner => banner.promotion_type === 'Banner' ).length > 0 && 
                       <div className='flex flex-row w-full overflow-y-scroll no-scrollbar h-[150px] pe-5 mt-3'>
                           {banners.filter(banner => banner.promotion_type === 'Banner' ).map((banner, index)=>
-                          <img src={BACK_HOST + banner.photo} className='rounded-lg ms-5 h-[150px] w-[280px]' key={index}/>
+                            <img src={BACK_HOST + banner.photo} className='rounded-lg ms-5 h-[150px] w-[280px]' key={index} onClick={()=>{setShowPromotionModal(true);setSelectedPromotion(banner);console.log('asd')}}/>
                           )}
                       </div>
                   }
@@ -61,6 +66,7 @@ export const BannersPromotions = ({searchText, establishment, banners, promotion
                     )
                   }
                 </div>
+                <ModalPromotion showPromotionModal={showPromotionModal} setShowPromotionModal={setShowPromotionModal} banner={selectedPromotion}/>
               </>
             }
           </>

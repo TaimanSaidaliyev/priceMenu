@@ -53,6 +53,10 @@ export class Dictionary {
         const response = await instance.post(BACK_HOST + `/product/get_list/`, body);
         return response;
     }
+    static async getTagsList() {
+        const response = await instance.get(BACK_HOST + `/dict/tags_list/`);
+        return response;
+    }
 }
 
 export class SetDict {
